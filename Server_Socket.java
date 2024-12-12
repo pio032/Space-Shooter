@@ -1,8 +1,13 @@
 import java.io.*;
-import java.net.*;
+import java.net.*;  
+
 
 public class Server_Socket {
-
+//verifica esistenza file utente
+    public static int FileUser(){
+    String path = "provaJava"; 
+    return 1;
+    }
     public static void main(String[] args) {
         // Porta su cui il server ascolta
         int port = 1890;
