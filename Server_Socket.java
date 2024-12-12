@@ -5,40 +5,50 @@ public class Server_Socket {
 
     public static void main(String[] args) {
         // Porta su cui il server ascolta
-        int port = 1255;
+        int port = 1890;
+        boolean a=true;
 
         try {
-            // Crea un oggetto ServerSocket che ascolta sulla porta specificata
+            // Crea un ServerSocket che ascolta sulla porta specificata
             ServerSocket serverSocket = new ServerSocket(port);
             System.out.println("Server in ascolto sulla porta " + port);
-
-            // Accetta la connessione di un client
+            // Il server attende che un client si connetta
             Socket clientSocket = serverSocket.accept();
-            System.out.println("Connessione accettata da " + clientSocket.getInetAddress());
-
-            // Crea gli stream di input e output per comunicare con il client
+            System.out.println("Client connesso da " + clientSocket.getInetAddress());
             BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
             PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
+            do{
+           
 
-            // Comunica con il client
-            String clientMessage;
-            while ((clientMessage = in.readLine()) != null) {
-                System.out.println("Messaggio dal client: " + clientMessage);
-                
-                // Rispondi al client
-                out.println("Server ha ricevuto: " + clientMessage);
-                
-                if (clientMessage.equalsIgnoreCase("bye")) {
-                    break;  // Esci se il client invia "bye"
-                }
+            
+           
+            // Crea un BufferedReader per leggere i dati inviati dal client
+            
+            
+            // Legge un messaggio inviato dal client
+            String clientMessage = in.readLine();
+            System.out.println("Messaggio dal client: " + clientMessage);
+
+            // Invia una risposta al client e risposta 
+            
+            if(clientMessage.equals("stop")){
+            //stop server
+            a=false;
+            out.println("Ottimo! La nostra conversazione termina qui!");
+            }else{
+            out.println("Ciao, client! Ho ricevuto il tuo messaggio. Quello che ho ricevuto è: "+clientMessage);
             }
-
-            // Chiudi la connessione
-            in.close();
-            out.close();
-            clientSocket.close();
-            serverSocket.close();
-            System.out.println("Connessione chiusa.");
+            
+            // Chiudi le connessioni e gli stream
+            
+            
+           
+        }while(a);
+        in.close();
+        out.close();
+        clientSocket.close();
+        serverSocket.close();
+        System.out.println("Connessione chiusa.");
         } catch (IOException e) {
             e.printStackTrace();
         }
