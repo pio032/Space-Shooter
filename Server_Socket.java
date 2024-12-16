@@ -1,6 +1,9 @@
 import java.io.*;
 import java.net.*;
 public class Server_Socket {
+
+
+
     //scrittra messaggi sul file
     public static void WrtiteFile(String usr, String msg, boolean fine) throws IOException {
     
@@ -15,6 +18,8 @@ public class Server_Socket {
         writer.close();
     }
     }
+
+
      // verifica esistenza file utente, caso contrario lo crea
     public static void CreationFile(String usr) throws IOException {
         String path = "C:\\Users\\PietroArdizzone\\OneDrive - ITS Angelo Rizzoli\\Documenti\\ProgettiVsCode\\progetto_UFS02";
@@ -24,6 +29,32 @@ public class Server_Socket {
         FileWriter writer = new FileWriter(usr, true);
         }
     }
+    
+    
+    public static String ReadFile(String usr){
+    String path = "C:\\Users\\PietroArdizzone\\OneDrive - ITS Angelo Rizzoli\\Documenti\\ProgettiVsCode\\progetto_UFS02";
+    usr=path+"//"+usr+".txt";
+    String testo="";
+    try {
+        // Crea un BufferedReader per leggere il file
+        BufferedReader reader = new BufferedReader(new FileReader(usr));
+        String linea;
+        
+        // Leggi ogni riga del file finché non raggiungi la fine
+        while ((linea = reader.readLine()) != null) {
+            testo=testo+linea+"\n"; 
+        }
+
+        // Chiudi il reader
+        reader.close();
+    } catch (IOException e) {
+        // Gestione delle eccezioni (es. file non trovato)
+        System.out.println("Errore nella lettura del file: " + e.getMessage());
+    
+    }
+        return testo;
+}
+
 
     public static void main(String[] args) {
         // Porta su cui il server ascolta
@@ -56,11 +87,13 @@ public class Server_Socket {
                     // stop server
                     a = false;
                     WrtiteFile(String.valueOf(clientSocket.getInetAddress()), clientMessage, true);
+                    out.println("ecco la nostra chat: "+ReadFile(String.valueOf(clientSocket.getInetAddress())));
                     out.println("Ottimo! La nostra conversazione termina qui!");
                 } else {
                     out.println(
                             "Ciao, client! Ho ricevuto il tuo messaggio. Quello che ho ricevuto è: " + clientMessage);
                             WrtiteFile(String.valueOf(clientSocket.getInetAddress()), clientMessage, false);
+                            
                 }
 
                 // Chiudi le connessioni e gli stream
