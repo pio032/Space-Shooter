@@ -61,6 +61,11 @@ public class Server_Socket {
             for(int j=9; j>-1; j--){
             try{
             if (campo[j][i]=='#') {
+            if (campo[j+1][i]=='@') {
+            lose=true;
+            campo[j][i]='.';
+            campo[j+1][i]='#'; 
+            }
             campo[j][i]='.';
             campo[j+1][i]='#';
             }
@@ -89,7 +94,7 @@ public class Server_Socket {
     }   
     //generzioneNemici
     public static char[][] gen(char[][]campo){
-    for(int i =0; i<5; i++){
+    for(int i =0; i<2; i++){
         int c =  (int) (Math.random()*10);
         int r = (int) (Math.random()*5);
         if (campo[r][c]=='#') {
@@ -110,8 +115,12 @@ public class Server_Socket {
                 for(int j=0; j<10; j++){
                 if (campo[i][j]=='@') {
                  try {
+                    if(campo[i][j-1]=='#'){
+                     lose=true;
+                    }else{
                   campo[i][j]='.'; 
                   campo[i][j-1]='@';
+                }
                  } catch (IndexOutOfBoundsException e) {
                  campo[i][j]='@';
                  
@@ -141,6 +150,7 @@ public class Server_Socket {
 
     return campo;
     }
+    //comparsa del colpo sulla matrice
     public static char[][] shot(char[][]campo){
         //ricerca della navicella
         for(int i =0; i<10; i++){
@@ -148,6 +158,7 @@ public class Server_Socket {
              if (campo[i][j]=='@') {
                 if (campo[i-1][j]=='#') {
                     campo[i-1][j]='.';
+                    colpo=true;
                 }else{
                     campo[i-1][j]='-';
                 }
@@ -185,6 +196,26 @@ public class Server_Socket {
         }   
     return campo;
     }
+
+
+    public static boolean check(char[][]campo){
+    boolean tr=false;
+    for(int i=0; i<10; i++){
+    for(int j=0; j<10; j++){
+    if (campo[i][j]=='#') {
+    tr=true;    
+    }
+    }
+    }
+    if(!tr){
+    return true;
+    }else{
+    return false;
+    }
+    }
+
+
+
 
     public static void main(String[] args) throws InterruptedException {
         // Porta su cui il server ascolta
@@ -232,6 +263,8 @@ public class Server_Socket {
                 out.println();
             }
             Thread.sleep(900);
+            out.println();
+            out.println();
             }
             colpo=false;
             }
@@ -243,8 +276,14 @@ public class Server_Socket {
             out.println("mi dispiace hai perso, i nemici sono arrivati fino alla fine!");
             }
             Thread.sleep(1000);
-            
+             //verifica vittoria
+             if(check(finito)){
+                out.println("Hai vinto!!!");
+                a=false;
+                break;
+                }
             }
+           
             // Chiudi le connessioni e gli stream
             in.close();
             out.close();
