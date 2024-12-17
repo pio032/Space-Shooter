@@ -4,6 +4,7 @@ public class Server_Socket {
 
     //creazione variabile di controllo globale
     public static boolean lose = false;
+    public static boolean colpo = false;
 
     //scrittra messaggi sul file
     public static void WrtiteFile(String usr, String msg, boolean fine) throws IOException {
@@ -156,6 +157,34 @@ public class Server_Socket {
         }
     return campo;
     }
+    //il colpo viene fatto salire verso l alto
+    public static char[][] colpisci_nemico(char[][]campo){
+        for(int i =0; i<10; i++){
+            for(int j=0; j<10; j++){
+             if(campo[i][j]=='-'){
+                try{
+                if(campo[i-1][j]=='.'){
+                campo[i-1][j]='-';
+                campo[i][j]='.';
+            }else{
+                campo[i-1][j]='.';
+                campo[i][j]='.';
+                colpo=true;
+                break;
+            }
+            } catch (IndexOutOfBoundsException e) {
+                System.out.println("sono passato!");
+                campo[i][j]='.';
+                colpo=true;
+                break;
+                
+                }
+                break;
+             }
+            }
+        }   
+    return campo;
+    }
 
     public static void main(String[] args) throws InterruptedException {
         // Porta su cui il server ascolta
@@ -188,9 +217,23 @@ public class Server_Socket {
             String clientMessage = (String)in.readLine();
             System.out.println(clientMessage);
             if(!clientMessage.equals(" ")){
+            //sposto navicella
             finito=updateCampo(finito,clientMessage);
             }else{
+            //colpo
             finito=shot(finito);
+            //sale il colpo
+            while (!colpo) { 
+            finito=colpisci_nemico(finito);  
+            for(int i =0; i<10; i++){
+                for(int j=0; j<10; j++){
+                    out.print(finito[i][j]);
+                }
+                out.println();
+            }
+            Thread.sleep(900);
+            }
+            colpo=false;
             }
             
             finito = scendi(finito);   
