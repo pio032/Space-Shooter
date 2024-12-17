@@ -2,7 +2,8 @@ import java.io.*;
 import java.net.*;
 public class Server_Socket {
 
-
+    //creazione variabile di controllo globale
+    public static boolean lose = false;
 
     //scrittra messaggi sul file
     public static void WrtiteFile(String usr, String msg, boolean fine) throws IOException {
@@ -55,10 +56,21 @@ public class Server_Socket {
         return testo;
 }
     public static char[][] scendi(char[][]campo){
-    
+        for(int i=0; i<10; i++){
+            for(int j=9; j>-1; j--){
+            try{
+            if (campo[j][i]=='#') {
+            campo[j][i]='.';
+            campo[j+1][i]='#';
+            }
+            }catch(IndexOutOfBoundsException e){
+            lose=true;
+            }
+            }
+        }
     return campo;
     }
-    //generazione campo
+    //generazio ne campo
     public static char[][] StartGame(){
     char[][]campo = new char[10][10];
     for(int i =0; i<10; i++){
@@ -76,7 +88,7 @@ public class Server_Socket {
     }   
     //generzioneNemici
     public static char[][] gen(char[][]campo){
-    for(int i =0; i<30; i++){
+    for(int i =0; i<5; i++){
         int c =  (int) (Math.random()*10);
         int r = (int) (Math.random()*5);
         if (campo[r][c]=='#') {
@@ -90,7 +102,7 @@ public class Server_Socket {
     
 
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
         // Porta su cui il server ascolta
         int port = 1234;
         boolean a = true;
@@ -110,14 +122,21 @@ public class Server_Socket {
             char[][]campo=StartGame();
             //lo riempio di nemici
             char[][]finito=gen(campo);
-            for(int i =0; i<10; i++){
-                for(int j=0; j<10; j++){
-                    out.print(finito[i][j]);
-                }
-                out.println();
-            }
             while (a) { 
-               
+                for(int i =0; i<10; i++){
+                    for(int j=0; j<10; j++){
+                        out.print(finito[i][j]);
+                    }
+                    out.println();
+                }
+            finito = scendi(finito);   
+            //conotrollo perdita
+            if(lose){
+            a=false;
+            out.println("mi dispiace hai perso, i nemici sono arrivati fino alla fine!");
+            }
+            Thread.sleep(2000);
+            
             }
             // Chiudi le connessioni e gli stream
             in.close();
