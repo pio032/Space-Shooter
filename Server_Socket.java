@@ -70,7 +70,7 @@ public class Server_Socket {
         }
     return campo;
     }
-    //generazio ne campo
+    //generazione campo
     public static char[][] StartGame(){
     char[][]campo = new char[10][10];
     for(int i =0; i<10; i++){
@@ -100,7 +100,45 @@ public class Server_Socket {
     return campo;
     }
     
+    //spostamento della navicella
+    public static char[][] updateCampo(char[][]campo, String a){
 
+        if(a.equals("a")){
+            //spostamento sx
+            for(int i =0; i<10; i++){
+                for(int j=0; j<10; j++){
+                if (campo[i][j]=='@') {
+                 try {
+                  campo[i][j]='.'; 
+                  campo[i][j-1]='@';
+                 } catch (IndexOutOfBoundsException e) {
+                 campo[i][j]='@';
+                 
+                 }  
+                } 
+                }
+            }
+
+        }else{
+         //spostamento dx
+         for(int i =0; i<10; i++){
+            for(int j=0; j<10; j++){
+            if (campo[i][j]=='@') {
+             try {
+              campo[i][j]='.'; 
+              campo[i][j+1]='@';
+             } catch (IndexOutOfBoundsException e) {
+             campo[i][j]='@';
+             
+             }  
+            } 
+            }
+        }
+        }
+    
+
+    return campo;
+    }
 
     public static void main(String[] args) throws InterruptedException {
         // Porta su cui il server ascolta
@@ -129,13 +167,17 @@ public class Server_Socket {
                     }
                     out.println();
                 }
+            //in utente
+            String clientMessage = (String)in.readLine();
+            System.out.println(clientMessage);
+            finito=updateCampo(finito,clientMessage);
             finito = scendi(finito);   
             //conotrollo perdita
             if(lose){
             a=false;
             out.println("mi dispiace hai perso, i nemici sono arrivati fino alla fine!");
             }
-            Thread.sleep(2000);
+            Thread.sleep(1000);
             
             }
             // Chiudi le connessioni e gli stream
