@@ -54,6 +54,40 @@ public class Server_Socket {
     }
         return testo;
 }
+    public static char[][] scendi(char[][]campo){
+    
+    return campo;
+    }
+    //generazione campo
+    public static char[][] StartGame(){
+    char[][]campo = new char[10][10];
+    for(int i =0; i<10; i++){
+        for(int j=0; j<10; j++){
+            if (i==9 && j==9) {
+                campo[i][j]='@';
+            }else{
+              
+                campo[i][j]='.';    
+            }
+            
+        }
+    }
+    return campo;
+    }   
+    //generzioneNemici
+    public static char[][] gen(char[][]campo){
+    for(int i =0; i<30; i++){
+        int c =  (int) (Math.random()*10);
+        int r = (int) (Math.random()*5);
+        if (campo[r][c]=='#') {
+        i--;
+        }else{
+        campo[r][c]='#';
+    }
+    }  
+    return campo;
+    }
+    
 
 
     public static void main(String[] args) {
@@ -72,33 +106,20 @@ public class Server_Socket {
             PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
             //crea il file nellla stessa cartella del programma, OCCHIO VALE SOLO SUL PC DELLA SCUOLA, CAMBIARE IL PATH
             CreationFile(String.valueOf(clientSocket.getInetAddress()));
-            // inizio del ciclo
-            do {
-                // Crea un BufferedReader per leggere i dati inviati dal client
-
-                // Legge un messaggio inviato dal client
-                String clientMessage = in.readLine();
-                System.out.println("Messaggio dal client: " + clientMessage);
-                //scrivi sul file il messaggio del client
-                
-                // Invia una risposta al client e risposta
-
-                if (clientMessage.equals("stop")) {
-                    // stop server
-                    a = false;
-                    WrtiteFile(String.valueOf(clientSocket.getInetAddress()), clientMessage, true);
-                    out.println("ecco la nostra chat: "+ReadFile(String.valueOf(clientSocket.getInetAddress())));
-                    out.println("Ottimo! La nostra conversazione termina qui!");
-                } else {
-                    out.println(
-                            "Ciao, client! Ho ricevuto il tuo messaggio. Quello che ho ricevuto è: " + clientMessage);
-                            WrtiteFile(String.valueOf(clientSocket.getInetAddress()), clientMessage, false);
-                            
+            // stampo il campo di gioco
+            char[][]campo=StartGame();
+            //lo riempio di nemici
+            char[][]finito=gen(campo);
+            for(int i =0; i<10; i++){
+                for(int j=0; j<10; j++){
+                    out.print(finito[i][j]);
                 }
-
-                // Chiudi le connessioni e gli stream
-
-            } while (a);
+                out.println();
+            }
+            while (a) { 
+               
+            }
+            // Chiudi le connessioni e gli stream
             in.close();
             out.close();
             clientSocket.close();
