@@ -96,7 +96,7 @@ public class Server_Socket {
 
     // generzioneNemici
     public static char[][] gen(char[][] campo) {
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 3; i++) {
             int c = (int) (Math.random() * 10);
             int r = (int) (Math.random() * 5);
             if (campo[r][c] == '#') {
