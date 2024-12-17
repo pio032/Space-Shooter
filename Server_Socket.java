@@ -130,13 +130,30 @@ public class Server_Socket {
              } catch (IndexOutOfBoundsException e) {
              campo[i][j]='@';
              
-             }  
+             }
+             break;  
             } 
             }
         }
         }
     
 
+    return campo;
+    }
+    public static char[][] shot(char[][]campo){
+        //ricerca della navicella
+        for(int i =0; i<10; i++){
+            for(int j=0; j<10; j++){
+             if (campo[i][j]=='@') {
+                if (campo[i-1][j]=='#') {
+                    campo[i-1][j]='.';
+                }else{
+                    campo[i-1][j]='-';
+                }
+             
+             }
+            }
+        }
     return campo;
     }
 
@@ -170,7 +187,12 @@ public class Server_Socket {
             //in utente
             String clientMessage = (String)in.readLine();
             System.out.println(clientMessage);
+            if(!clientMessage.equals(" ")){
             finito=updateCampo(finito,clientMessage);
+            }else{
+            finito=shot(finito);
+            }
+            
             finito = scendi(finito);   
             //conotrollo perdita
             if(lose){
