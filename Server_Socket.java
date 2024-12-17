@@ -242,7 +242,20 @@ public class Server_Socket {
             while (a) { 
                 for(int i =0; i<10; i++){
                     for(int j=0; j<10; j++){
-                        out.print(finito[i][j]);
+                        if (finito[i][j]=='@') {
+                        out.print("🚀");   
+                        out.print(" "); 
+                        }else{
+                        if (finito[i][j]=='#') {
+                        out.print("👾"); 
+                        out.print(" "); 
+                        }else{
+                            out.print(finito[i][j]);
+                            
+                        }
+                        
+                        }
+                       
                     }
                     out.println();
                 }
