@@ -219,6 +219,7 @@ public class Server_Socket {
 
 
 
+
     public static void main(String[] args) throws InterruptedException {
         // Porta su cui il server ascolta
         int port = 1234;
@@ -244,11 +245,14 @@ public class Server_Socket {
                     for(int j=0; j<10; j++){
                         if (finito[i][j]=='@') {
                         out.print("🚀");   
-                        out.print(" "); 
+                        
                         }else{
                         if (finito[i][j]=='#') {
-                        out.print("👾"); 
-                        out.print(" "); 
+                        out.print("👽"); 
+                        if (j!=9) {
+                            j++;     
+                           }
+                         
                         }else{
                             out.print(finito[i][j]);
                             
@@ -273,7 +277,27 @@ public class Server_Socket {
             finito=colpisci_nemico(finito);  
             for(int i =0; i<10; i++){
                 for(int j=0; j<10; j++){
-                    out.print(finito[i][j]);
+                    if (finito[i][j]=='@') {
+                        out.print("🚀");   
+                        
+                        }else{
+                        if (finito[i][j]=='#') {
+                        out.print("👽"); 
+                        if (j!=9) {
+                         j++;     
+                        }
+                         
+                        }else{
+                        if (finito[i][j]=='-') {
+                        out.print("💣"); 
+                        }else{
+                            out.print(finito[i][j]);
+                        }
+                           
+                            
+                        }
+                        
+                        }
                 }
                 out.println();
             }
