@@ -109,17 +109,18 @@ public class Server_Socket {
     //spostamento della navicella
     public static char[][] updateCampo(char[][]campo, String a){
 
-        if(a.equals("a")){
+        if('a'==a.charAt(0)){
             //spostamento sx
             for(int i =0; i<10; i++){
                 for(int j=0; j<10; j++){
                 if (campo[i][j]=='@') {
+                 int spostamento=a.length();
                  try {
-                    if(campo[i][j-1]=='#'){
+                    if(campo[i][j-spostamento]=='#'){
                      lose=true;
                     }else{
                   campo[i][j]='.'; 
-                  campo[i][j-1]='@';
+                  campo[i][j-spostamento]='@';
                 }
                  } catch (IndexOutOfBoundsException e) {
                  campo[i][j]='@';
@@ -135,8 +136,9 @@ public class Server_Socket {
             for(int j=0; j<10; j++){
             if (campo[i][j]=='@') {
              try {
+                int spostamento=a.length();
               campo[i][j]='.'; 
-              campo[i][j+1]='@';
+              campo[i][j+spostamento]='@';
              } catch (IndexOutOfBoundsException e) {
              campo[i][j]='@';
              
