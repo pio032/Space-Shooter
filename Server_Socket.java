@@ -245,7 +245,7 @@ public class Server_Socket {
                             break;
                         }
                     } catch (IndexOutOfBoundsException e) {
-                        System.out.println("sono passato!");
+                       
                         campo[i][j] = '.';
                         colpo = true;
                         break;
@@ -273,7 +273,7 @@ public class Server_Socket {
             return false;
         }
     }
-
+    //MAIN
     public static void main(String[] args) throws InterruptedException, IOException {
         // Porta su cui il server ascolta
         int port = 1234;
@@ -385,12 +385,12 @@ public class Server_Socket {
                         } else {
                             if (finito[i][j] == '#') {
                                 out.print("👽");
-                                if (j != 9) {
+                              /*  if (j != 9) {
                                     j++;
-                                }
+                                } */
 
                             } else {
-                                out.print(finito[i][j]);
+                                out.print("🌟");
 
                             }
 
@@ -419,15 +419,15 @@ public class Server_Socket {
                                 } else {
                                     if (finito[i][j] == '#') {
                                         out.print("👽");
-                                        if (j != 9) {
+                                      /*  if (j != 9) {
                                             j++;
-                                        }
-
+                                        }*/
+                                        
                                     } else {
                                         if (finito[i][j] == '-') {
                                             out.print("💣");
                                         } else {
-                                            out.print(finito[i][j]);
+                                            out.print("🌟");
                                         }
 
                                     }
