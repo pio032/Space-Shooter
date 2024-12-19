@@ -59,10 +59,12 @@ public class Server_Socket {
 
                 
                
-                // Stampa i dati dell'utente
+                // verifica dati
+                /*
                 System.out.println("user: " + nomeUtente);
                 System.out.println("pw: " + password);
                 System.out.println("----------");
+                 */
             }
             for (int j =0; j<users.length; j=j+2){
                 if (j!=users.length) {
@@ -318,7 +320,6 @@ public class Server_Socket {
             out.print("ciao dimmi la pw: \n");
             out.flush();  // Forza il flush del buffer per stampare subito il messaggio
             String pw = (String) in.readLine();
-            System.out.println("ARRIVANO DALLA RETE!! il tuo nome: "+user+" la tua pw: "+pw);
             //lettura di piu utenti dal file json
               try {
             // Leggi il file JSON
@@ -354,9 +355,10 @@ public class Server_Socket {
         } catch (IOException e) {
             e.printStackTrace();
         }
-              
+       if(!user.equals("null") && !pw.equals("")) {  
         WriteFile(user, pw, "user");
-            
+        System.out.println("sono passato!");
+    }
             
             
             
