@@ -11,12 +11,80 @@ public class Server_Socket {
 
     // scrittra messaggi sul file
     public static void WriteFile(String username, String password, String nome) throws IOException {
+        String[]users ;
+        String completa="";
+        try {
+            // Leggi il file JSON
+            String contenuto = ReadFile("user");
+            // Rimuovi le parentesi quadre (array JSON)
+            contenuto = contenuto.trim();
+            if (contenuto.startsWith("[") && contenuto.endsWith("]")) {
+                contenuto = contenuto.substring(1, contenuto.length() - 1).trim();
+            }
 
-        //String path = "C:\\Users\\PietroArdizzone\\OneDrive - ITS Angelo Rizzoli\\Documenti\\ProgettiVsCode\\progetto_UFS02";
-        String jsonContent = "{\n" +
+            // Dividi il contenuto in singoli oggetti JSON (ogni oggetto è un utente)
+            String[] utentiJson = contenuto.split("\\},\\{");
+
+            // Crea una lista per memorizzare gli utenti
+            List<String> utenti = new ArrayList<>();
+
+            // Elenco degli utenti
+            for (String utenteJson : utentiJson) {
+                // Aggiungi le parentesi graffe mancanti per ogni oggetto
+                utenteJson = "{" + utenteJson + "}";
+                utenti.add(utenteJson);
+            }
+
+            // Per ogni utente, estrai i dettagli
+            System.out.println(utenti.size()*2);
+            users = new String[utenti.size()*2]; 
+            
+            int i =0;
+            for (String utente : utenti) {
+                String nomeUtente = extractKey(utente, "username");
+                String pw = extractKey(utente, "password");
+                System.out.println(i);
+                if(i+2<users.length){
+                    i=i+2;
+                }
+                if(i!=users.length){
+                if (!nomeUtente.equals("null") &&
+                 !pw.equals("null")
+                 ) {
+                    users[i]=nomeUtente;
+                    users[i+1]=pw;  
+                }
+               
+            }
+
+                
+               
+                // Stampa i dati dell'utente
+                System.out.println("user: " + nomeUtente);
+                System.out.println("pw: " + password);
+                System.out.println("----------");
+            }
+            for (int j =0; j<users.length; j=j+2){
+                if (j!=users.length) {
+                    completa=completa+"{\n" +
+                    "  \"username\": \"" + users[j] + "\",\n" +
+                    "  \"password\": \"" + users[j+1] + "\"\n" +
+                    "},";  
+                }
+              
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        /*
+         * leggo il file, concateno la stringa e riscrivo --> stesso codice che ho nel main per la lettura
+         */
+        
+        
+        String jsonContent = "["+completa+"{\n" +
                              "  \"username\": \"" + username + "\",\n" +
                              "  \"password\": \"" + password + "\"\n" +
-                             "}";
+                             "}"+"]";
 
         // Scrivere nel file JSON
         try (FileWriter writer = new FileWriter("./"+nome+".json")) {
@@ -227,6 +295,7 @@ public class Server_Socket {
         // Porta su cui il server ascolta
         int port = 1234;
         boolean a = true;
+        //creazione del file
         CreationFile("user");
 
         try {
@@ -239,8 +308,6 @@ public class Server_Socket {
             PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
             BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
             
-            // crea il file nellla stessa cartella del programma, OCCHIO VALE SOLO SUL PC
-            // DELLA SCUOLA, CAMBIARE IL PATH
             
 
 
@@ -251,12 +318,11 @@ public class Server_Socket {
             out.print("ciao dimmi la pw: \n");
             out.flush();  // Forza il flush del buffer per stampare subito il messaggio
             String pw = (String) in.readLine();
-            System.out.println("il tuo nome: "+user+" la tua pw: "+pw);
+            System.out.println("ARRIVANO DALLA RETE!! il tuo nome: "+user+" la tua pw: "+pw);
             //lettura di piu utenti dal file json
               try {
             // Leggi il file JSON
             String contenuto = ReadFile("user");
-
             // Rimuovi le parentesi quadre (array JSON)
             contenuto = contenuto.trim();
             if (contenuto.startsWith("[") && contenuto.endsWith("]")) {
@@ -288,8 +354,8 @@ public class Server_Socket {
         } catch (IOException e) {
             e.printStackTrace();
         }
-              //leggo se c'è nome utente e pw
-              WriteFile(user, pw, add);
+              
+        WriteFile(user, pw, "user");
             
             
             
