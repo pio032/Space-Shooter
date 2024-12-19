@@ -230,11 +230,24 @@ public class Server_Socket {
             // Il server attende che un client si connetta
             Socket clientSocket = serverSocket.accept();
             System.out.println("Client connesso da " + clientSocket.getInetAddress());
-            BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
             PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
+            BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+            
             // crea il file nellla stessa cartella del programma, OCCHIO VALE SOLO SUL PC
             // DELLA SCUOLA, CAMBIARE IL PATH
             CreationFile(String.valueOf(clientSocket.getInetAddress()));
+
+            
+            //LOGIN
+            out.print("ciao dimmi il tuo nome utente!: \n");
+            out.flush();  // Forza il flush del buffer per stampare subito il messaggio
+            String user = in.readLine();
+            out.print("ciao dimmi la pw: \n");
+            out.flush();  // Forza il flush del buffer per stampare subito il messaggio
+            String pw = (String) in.readLine();
+            System.out.println("il tuo nome: "+user+" la tua pw: "+pw);
+
+
             // stampo il campo di gioco
             char[][] campo = StartGame();
             // lo riempio di nemici
