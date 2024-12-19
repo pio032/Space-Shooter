@@ -1,5 +1,7 @@
 import java.io.*;
 import java.net.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Server_Socket {
 
@@ -221,10 +223,11 @@ public class Server_Socket {
         }
     }
 
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) throws InterruptedException, IOException {
         // Porta su cui il server ascolta
         int port = 1234;
         boolean a = true;
+        CreationFile("user");
 
         try {
             // Crea un ServerSocket che ascolta sulla porta specificata
@@ -238,7 +241,7 @@ public class Server_Socket {
             
             // crea il file nellla stessa cartella del programma, OCCHIO VALE SOLO SUL PC
             // DELLA SCUOLA, CAMBIARE IL PATH
-            CreationFile(String.valueOf(clientSocket.getInetAddress()));
+            
 
 
             //LOGIN
@@ -249,14 +252,45 @@ public class Server_Socket {
             out.flush();  // Forza il flush del buffer per stampare subito il messaggio
             String pw = (String) in.readLine();
             System.out.println("il tuo nome: "+user+" la tua pw: "+pw);
-            String add=(String.valueOf(clientSocket.getInetAddress()));
-            String r = ReadFile(String.valueOf(clientSocket.getInetAddress()));
-            String nomeUtente = extractKey(r, "username");
-            String password = extractKey(r, "password");
-            if (nomeUtente.equals("")) {
+            //lettura di piu utenti dal file json
+              try {
+            // Leggi il file JSON
+            String contenuto = ReadFile("user");
+
+            // Rimuovi le parentesi quadre (array JSON)
+            contenuto = contenuto.trim();
+            if (contenuto.startsWith("[") && contenuto.endsWith("]")) {
+                contenuto = contenuto.substring(1, contenuto.length() - 1).trim();
+            }
+
+            // Dividi il contenuto in singoli oggetti JSON (ogni oggetto è un utente)
+            String[] utentiJson = contenuto.split("\\},\\{");
+
+            // Crea una lista per memorizzare gli utenti
+            List<String> utenti = new ArrayList<>();
+
+            // Elenco degli utenti
+            for (String utenteJson : utentiJson) {
+                // Aggiungi le parentesi graffe mancanti per ogni oggetto
+                utenteJson = "{" + utenteJson + "}";
+                utenti.add(utenteJson);
+            }
+
+            // Per ogni utente, estrai i dettagli
+            for (String utente : utenti) {
+                String nomeUtente = extractKey(utente, "username");
+                String password = extractKey(utente, "password");
+                // Stampa i dati dell'utente
+                System.out.println("user: " + nomeUtente);
+                System.out.println("pw: " + password);
+                System.out.println("----------");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
               //leggo se c'è nome utente e pw
               WriteFile(user, pw, add);
-            }
+            
             
             
             
