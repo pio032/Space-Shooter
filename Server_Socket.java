@@ -303,6 +303,7 @@ public class Server_Socket {
             String pw = (String) in.readLine();
             //lettura di piu utenti dal file json
             boolean ctrl = false;
+            boolean UExist=false;
               try {
             // Leggi il file JSON
             String contenuto = ReadFile("user");
@@ -337,19 +338,32 @@ public class Server_Socket {
                 if(nomeUtente.equals(user) && password.equals(pw)){
                     ctrl=true;
                 }
+                if(nomeUtente.equals(user) && !password.equals(pw)){
+                    UExist=true;
+                }
 
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
          if(ctrl){
-            out.print("benvenuto "+user);
-         }else{
-            out.print("Non hai ancora un utente? nessun probelma te lo creo io! il tuo username è: "+user+"\n\n");
-            if(!user.equals("null") && !pw.equals("")) {  
-                WriteFile(user, pw, "user");
-                System.out.println("sono passato!");
+            if(UExist){
+               
+            }else{
+                out.print("benvenuto "+user);
             }
+           
+         }else{
+            if(UExist){
+                out.print("scegli un altro nome utente, questo è gia utilizzato! (2)");
+            }else{
+                out.print("Non hai ancora un utente? nessun probelma te lo creo io! il tuo username è: "+user+"\n\n");
+                if(!user.equals("null") && !pw.equals("")) {  
+                    WriteFile(user, pw, "user");
+                    System.out.println("sono passato!");
+                }
+            }
+           
                     
          }
        
