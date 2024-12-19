@@ -350,12 +350,12 @@ public class Server_Socket {
             if(UExist){
                
             }else{
-                out.print("benvenuto "+user);
+                out.print("benvenuto "+user+"\n");
             }
            
          }else{
             if(UExist){
-                out.print("scegli un altro nome utente, questo è gia utilizzato! (2)");
+                out.print("Hai sbagliato la password! \n");
             }else{
                 out.print("Non hai ancora un utente? nessun probelma te lo creo io! il tuo username è: "+user+"\n\n");
                 if(!user.equals("null") && !pw.equals("")) {  
