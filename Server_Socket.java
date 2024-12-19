@@ -8,24 +8,28 @@ public class Server_Socket {
     public static boolean colpo = false;
 
     // scrittra messaggi sul file
-    public static void WrtiteFile(String usr, String msg, boolean fine) throws IOException {
+    public static void WriteFile(String username, String password, String nome) throws IOException {
 
-        String path = "C:\\Users\\PietroArdizzone\\OneDrive - ITS Angelo Rizzoli\\Documenti\\ProgettiVsCode\\progetto_UFS02";
-        usr = path + "//" + usr + ".txt";
-        FileWriter writer = new FileWriter(usr, true);
-        if (!fine) {
-            writer.write(msg + " ");
-            writer.close();
-        } else {
-            writer.write("\n");
-            writer.close();
-        }
+        //String path = "C:\\Users\\PietroArdizzone\\OneDrive - ITS Angelo Rizzoli\\Documenti\\ProgettiVsCode\\progetto_UFS02";
+        String jsonContent = "{\n" +
+                             "  \"username\": \"" + username + "\",\n" +
+                             "  \"password\": \"" + password + "\"\n" +
+                             "}";
+
+        // Scrivere nel file JSON
+        try (FileWriter writer = new FileWriter("./"+nome+".json")) {
+            writer.write(jsonContent);
+            System.out.println("File JSON scritto correttamente!");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }   
+    
     }
 
     // verifica esistenza file utente, caso contrario lo crea
     public static void CreationFile(String usr) throws IOException {
-        String path = "C:\\Users\\PietroArdizzone\\OneDrive - ITS Angelo Rizzoli\\Documenti\\ProgettiVsCode\\progetto_UFS02";
-        usr = path + "//" + usr + ".txt";
+        //String path = "C:\\Users\\PietroArdizzone\\OneDrive - ITS Angelo Rizzoli\\Documenti\\ProgettiVsCode\\progetto_UFS02";
+        usr ="./"+usr + ".json";
         File a = new File(usr);
         if (!a.exists()) {
             FileWriter writer = new FileWriter(usr, true);
@@ -33,8 +37,8 @@ public class Server_Socket {
     }
 
     public static String ReadFile(String usr) {
-        String path = "C:\\Users\\PietroArdizzone\\OneDrive - ITS Angelo Rizzoli\\Documenti\\ProgettiVsCode\\progetto_UFS02";
-        usr = path + "//" + usr + ".txt";
+       // String path = "C:\\Users\\PietroArdizzone\\OneDrive - ITS Angelo Rizzoli\\Documenti\\ProgettiVsCode\\progetto_UFS02";
+        usr ="./"+usr + ".json";
         String testo = "";
         try {
             // Crea un BufferedReader per leggere il file
@@ -237,7 +241,7 @@ public class Server_Socket {
             // DELLA SCUOLA, CAMBIARE IL PATH
             CreationFile(String.valueOf(clientSocket.getInetAddress()));
 
-            
+
             //LOGIN
             out.print("ciao dimmi il tuo nome utente!: \n");
             out.flush();  // Forza il flush del buffer per stampare subito il messaggio
@@ -246,7 +250,8 @@ public class Server_Socket {
             out.flush();  // Forza il flush del buffer per stampare subito il messaggio
             String pw = (String) in.readLine();
             System.out.println("il tuo nome: "+user+" la tua pw: "+pw);
-
+            String add=(String.valueOf(clientSocket.getInetAddress()));
+            WriteFile(user, pw, add);
 
             // stampo il campo di gioco
             char[][] campo = StartGame();
