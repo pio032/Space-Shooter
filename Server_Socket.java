@@ -295,10 +295,10 @@ public class Server_Socket {
 
 
             //LOGIN
-            out.print("ciao dimmi il tuo nome utente!: \n");
+            out.print("Ciao! Dimmi il tuo nome utente: \n");
             out.flush();  // Forza il flush del buffer per stampare subito il messaggio
             String user = in.readLine();
-            out.print("ciao dimmi la pw: \n");
+            out.print("Ciao! Dimmi la tua password: \n");
             out.flush();  // Forza il flush del buffer per stampare subito il messaggio
             String pw = (String) in.readLine();
             //lettura di piu utenti dal file json
@@ -350,7 +350,7 @@ public class Server_Socket {
             if(UExist){
                
             }else{
-                out.print("benvenuto "+user+"\n");
+                out.print("Benvenuto "+user+"\n");
             }
            
          }else{
