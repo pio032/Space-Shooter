@@ -35,29 +35,28 @@ public class Server_Socket {
             FileWriter writer = new FileWriter(usr, true);
         }
     }
-
-    public static String ReadFile(String usr) {
-       // String path = "C:\\Users\\PietroArdizzone\\OneDrive - ITS Angelo Rizzoli\\Documenti\\ProgettiVsCode\\progetto_UFS02";
+    //leggo dal file json
+    public static String ReadFile(String usr) throws IOException {
         usr ="./"+usr + ".json";
-        String testo = "";
-        try {
-            // Crea un BufferedReader per leggere il file
-            BufferedReader reader = new BufferedReader(new FileReader(usr));
-            String linea;
-
-            // Leggi ogni riga del file finché non raggiungi la fine
-            while ((linea = reader.readLine()) != null) {
-                testo = testo + linea + "\n";
+        StringBuilder contenuto = new StringBuilder(); //oggetto lettura
+        try (BufferedReader reader = new BufferedReader(new FileReader(usr))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                contenuto.append(line).append("\n");
             }
-
-            // Chiudi il reader
-            reader.close();
-        } catch (IOException e) {
-            // Gestione delle eccezioni (es. file non trovato)
-            System.out.println("Errore nella lettura del file: " + e.getMessage());
-
         }
-        return testo;
+        return contenuto.toString();
+    }
+    public static String extractKey(String estratto, String key){
+        String pattern = "\"" + key + "\"\\s*:\\s*\"([^\"]+)\"";
+        String valore = "";
+        // cerco la corrispondenza del pattern con la chiave e il valore
+        java.util.regex.Pattern r = java.util.regex.Pattern.compile(pattern);
+        java.util.regex.Matcher m = r.matcher(estratto);
+        if (m.find()) {
+            valore = m.group(1); // Estrai il valore catturato
+        }
+        return valore;
     }
 
     public static char[][] scendi(char[][] campo) {
@@ -251,8 +250,16 @@ public class Server_Socket {
             String pw = (String) in.readLine();
             System.out.println("il tuo nome: "+user+" la tua pw: "+pw);
             String add=(String.valueOf(clientSocket.getInetAddress()));
-            WriteFile(user, pw, add);
-
+            String r = ReadFile(String.valueOf(clientSocket.getInetAddress()));
+            String nomeUtente = extractKey(r, "username");
+            String password = extractKey(r, "password");
+            if (nomeUtente.equals("")) {
+              //leggo se c'è nome utente e pw
+              WriteFile(user, pw, add);
+            }
+            
+            
+            
             // stampo il campo di gioco
             char[][] campo = StartGame();
             // lo riempio di nemici
