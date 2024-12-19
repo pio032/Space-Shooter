@@ -37,26 +37,7 @@ public class Server_Socket {
 
             // Per ogni utente, estrai i dettagli
             System.out.println(utenti.size()*2);
-            users = new String[utenti.size()*2]; 
-            
-            int i =0;
-            for (String utente : utenti) {
-                String nomeUtente = extractKey(utente, "username");
-                String pw = extractKey(utente, "password");
-                System.out.println(i);
-                if(i+2<users.length){
-                    i=i+2;
-                }
-                if(i!=users.length){
-                if (!nomeUtente.equals("null") &&
-                 !pw.equals("null")
-                 ) {
-                    users[i]=nomeUtente;
-                    users[i+1]=pw;  
-                }
-               
-            }
-
+           
                 
                
                 // verifica dati
@@ -65,14 +46,14 @@ public class Server_Socket {
                 System.out.println("pw: " + password);
                 System.out.println("----------");
                  */
-            }
-            for (int j =0; j<users.length; j=j+2){
-                if (j!=users.length) {
+            
+            for (int j =0; j<utenti.size(); j++){
+                    String utente = utenti.get(j);
                     completa=completa+"{\n" +
-                    "  \"username\": \"" + users[j] + "\",\n" +
-                    "  \"password\": \"" + users[j+1] + "\"\n" +
+                    "  \"username\": \"" + extractKey(utente, "username") + "\",\n" +
+                    "  \"password\": \"" + extractKey(utente, "password") + "\"\n" +
                     "},";  
-                }
+                
               
             }
         } catch (IOException e) {
@@ -321,6 +302,7 @@ public class Server_Socket {
             out.flush();  // Forza il flush del buffer per stampare subito il messaggio
             String pw = (String) in.readLine();
             //lettura di piu utenti dal file json
+            boolean ctrl = false;
               try {
             // Leggi il file JSON
             String contenuto = ReadFile("user");
@@ -335,7 +317,7 @@ public class Server_Socket {
 
             // Crea una lista per memorizzare gli utenti
             List<String> utenti = new ArrayList<>();
-
+            
             // Elenco degli utenti
             for (String utenteJson : utentiJson) {
                 // Aggiungi le parentesi graffe mancanti per ogni oggetto
@@ -347,19 +329,30 @@ public class Server_Socket {
             for (String utente : utenti) {
                 String nomeUtente = extractKey(utente, "username");
                 String password = extractKey(utente, "password");
-                // Stampa i dati dell'utente
+                // verifica utenti
+
                 System.out.println("user: " + nomeUtente);
                 System.out.println("pw: " + password);
                 System.out.println("----------");
+                if(nomeUtente.equals(user) && password.equals(pw)){
+                    ctrl=true;
+                }
+
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
-       if(!user.equals("null") && !pw.equals("")) {  
-        WriteFile(user, pw, "user");
-        System.out.println("sono passato!");
-    }
-            
+         if(ctrl){
+            out.print("benvenuto "+user);
+         }else{
+            out.print("Non hai ancora un utente? nessun probelma te lo creo io! il tuo username è: "+user+"\n\n");
+            if(!user.equals("null") && !pw.equals("")) {  
+                WriteFile(user, pw, "user");
+                System.out.println("sono passato!");
+            }
+                    
+         }
+       
             
             
             // stampo il campo di gioco
