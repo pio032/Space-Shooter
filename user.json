@@ -1,34 +1,13 @@
 [{
   "username": "",
-  "password": ""
-},{
-  "username": "luca",
-  "password": "123"
-},{
-  "username": "1",
-  "password": "1"
-},{
-  "username": "2",
-  "password": "2"
-},{
-  "username": "s�",
-  "password": "s"
-},{
-  "username": "l",
-  "password": "l"
-},{
-  "username": "p",
-  "password": "a"
-},{
-  "username": "t",
-  "password": "t"
-},{
-  "username": "g",
-  "password": "g"
+  "password": "",
+  "vittorie": ""
 },{
   "username": "r",
-  "password": "r"
-},{
-  "username": "u",
-  "password": "u"
+  "password": "r",
+  {
+  "username": "r",
+  "password": "r",
+  "vittorie": "1"
+}
 }]

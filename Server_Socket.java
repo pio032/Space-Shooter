@@ -10,9 +10,9 @@ public class Server_Socket {
     public static boolean colpo = false;
 
     // scrittra messaggi sul file
-    public static void WriteFile(String username, String password, String nome) throws IOException {
-        String[]users ;
-        String completa="";
+    public static void WriteFile(String username, String password, String nome, int win) throws IOException {
+        String[] users;
+        String completa = "";
         try {
             // Leggi il file JSON
             String contenuto = ReadFile("user");
@@ -36,62 +36,114 @@ public class Server_Socket {
             }
 
             // Per ogni utente, estrai i dettagli
-            System.out.println(utenti.size()*2);
-           
-                
-               
-                // verifica dati
-                /*
-                System.out.println("user: " + nomeUtente);
-                System.out.println("pw: " + password);
-                System.out.println("----------");
-                 */
-            
-            for (int j =0; j<utenti.size(); j++){
-                    String utente = utenti.get(j);
-                    completa=completa+"{\n" +
-                    "  \"username\": \"" + extractKey(utente, "username") + "\",\n" +
-                    "  \"password\": \"" + extractKey(utente, "password") + "\"\n" +
-                    "},";  
-                
-              
+            System.out.println(utenti.size() * 2);
+
+            // verifica dati
+            /*
+             * System.out.println("user: " + nomeUtente);
+             * System.out.println("pw: " + password);
+             * System.out.println("----------");
+             */
+
+            for (int j = 0; j < utenti.size(); j++) {
+                String utente = utenti.get(j);
+                completa = completa + "{\n" +
+                        "  \"username\": \"" + extractKey(utente, "username") + "\",\n" +
+                        "  \"password\": \"" + extractKey(utente, "password") + "\",\n" +
+                        "  \"vittorie\": \"" + extractKey(utente, "win") + "\"\n" +
+                        "},";
+
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
         /*
-         * leggo il file, concateno la stringa e riscrivo --> stesso codice che ho nel main per la lettura
+         * leggo il file, concateno la stringa e riscrivo --> stesso codice che ho nel
+         * main per la lettura
          */
-        
-        
-        String jsonContent = "["+completa+"{\n" +
-                             "  \"username\": \"" + username + "\",\n" +
-                             "  \"password\": \"" + password + "\"\n" +
-                             "}"+"]";
+
+        String jsonContent = "[" + completa + "{\n" +
+                "  \"username\": \"" + username + "\",\n" +
+                "  \"password\": \"" + password + "\",\n" +
+                "  \"vittorie\": \"" + String.valueOf(win) + "\"\n" +
+                "}" + "]";
 
         // Scrivere nel file JSON
-        try (FileWriter writer = new FileWriter("./"+nome+".json")) {
+        try (FileWriter writer = new FileWriter("./" + nome + ".json")) {
             writer.write(jsonContent);
             System.out.println("File JSON scritto correttamente!");
         } catch (IOException e) {
             e.printStackTrace();
-        }   
-    
+        }
+
+    }
+
+    // aggiunvi vittoria
+    public static void scrivi_vittoria(String username, String password, String win) {
+
+        // Pattern per cercare la chiave e il suo valore
+        String pattern = "\"vittorie\"\\s*:\\s*\"([^\"]+)\"";
+         
+        // Costruisci il nuovo valore JSON con la chiave aggiornata
+        System.out.println("eccomi: quello che ho ricevuto"+win);
+        String newJson = "{\n" +
+                "  \"username\": \"" + username + "\",\n" +
+                "  \"password\": \"" + password + "\",\n" +
+                "  \"vittorie\": \"" + String.valueOf(win) + "\"\n" +
+                "}";
+        System.out.println("eccomi: "+newJson);
+        upDateJson(newJson);
+
+    }
+
+    public static void upDateJson(String add) {
+        try {
+
+            // Leggi il contenuto del file JSON come stringa
+            FileReader reader = new FileReader("./user.json");
+            StringBuilder jsonContent = new StringBuilder();
+            int i;
+            while ((i = reader.read()) != -1) {
+                jsonContent.append((char) i);
+            }
+            reader.close();
+
+            // Converti il contenuto in una stringa
+            String jsonString = jsonContent.toString();
+
+            // Crea un pattern per trovare la chiave e il valore
+            String pattern = "(\"" + "vittorie" + "\")\\s*:\\s*\"([^\"]+)\"";
+
+            // Sostituisci il vecchio valore con il nuovo valore
+            String updatedJson = jsonString.replaceAll(pattern, add);
+
+            // Scrivi la stringa aggiornata nel file JSON
+            FileWriter writer = new FileWriter("./user.json");
+            writer.write(updatedJson);
+            writer.close();
+
+            System.out.println("File JSON aggiornato con successo!");
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     // verifica esistenza file utente, caso contrario lo crea
     public static void CreationFile(String usr) throws IOException {
-        //String path = "C:\\Users\\PietroArdizzone\\OneDrive - ITS Angelo Rizzoli\\Documenti\\ProgettiVsCode\\progetto_UFS02";
-        usr ="./"+usr + ".json";
+        // String path = "C:\\Users\\PietroArdizzone\\OneDrive - ITS Angelo
+        // Rizzoli\\Documenti\\ProgettiVsCode\\progetto_UFS02";
+        usr = "./" + usr + ".json";
         File a = new File(usr);
         if (!a.exists()) {
             FileWriter writer = new FileWriter(usr, true);
         }
     }
-    //leggo dal file json
+
+    // leggo dal file json
     public static String ReadFile(String usr) throws IOException {
-        usr ="./"+usr + ".json";
-        StringBuilder contenuto = new StringBuilder(); //oggetto lettura
+        usr = "./" + usr + ".json";
+        StringBuilder contenuto = new StringBuilder(); // oggetto lettura
         try (BufferedReader reader = new BufferedReader(new FileReader(usr))) {
             String line;
             while ((line = reader.readLine()) != null) {
@@ -100,7 +152,8 @@ public class Server_Socket {
         }
         return contenuto.toString();
     }
-    public static String extractKey(String estratto, String key){
+
+    public static String extractKey(String estratto, String key) {
         String pattern = "\"" + key + "\"\\s*:\\s*\"([^\"]+)\"";
         String valore = "";
         // cerco la corrispondenza del pattern con la chiave e il valore
@@ -245,7 +298,7 @@ public class Server_Socket {
                             break;
                         }
                     } catch (IndexOutOfBoundsException e) {
-                       
+
                         campo[i][j] = '.';
                         colpo = true;
                         break;
@@ -273,14 +326,15 @@ public class Server_Socket {
             return false;
         }
     }
-    //MAIN
+
+    // MAIN
     public static void main(String[] args) throws InterruptedException, IOException {
         // Porta su cui il server ascolta
         int port = 1234;
         boolean a = true;
-        //creazione del file
+        // creazione del file
         CreationFile("user");
-
+        int win = 0;
         try {
             // Crea un ServerSocket che ascolta sulla porta specificata
             ServerSocket serverSocket = new ServerSocket(port);
@@ -290,85 +344,88 @@ public class Server_Socket {
             System.out.println("Client connesso da " + clientSocket.getInetAddress());
             PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
             BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-            
-            
-
-
-            //LOGIN
+            String userF = "";
+            // LOGIN
             out.print("Ciao! Dimmi il tuo nome utente: \n");
-            out.flush();  // Forza il flush del buffer per stampare subito il messaggio
+            out.flush(); // Forza il flush del buffer per stampare subito il messaggio
             String user = in.readLine();
             out.print("Ciao! Dimmi la tua password: \n");
-            out.flush();  // Forza il flush del buffer per stampare subito il messaggio
+            out.flush(); // Forza il flush del buffer per stampare subito il messaggio
             String pw = (String) in.readLine();
-            //lettura di piu utenti dal file json
+            // lettura di piu utenti dal file json
             boolean ctrl = false;
-            boolean UExist=false;
-              try {
-            // Leggi il file JSON
-            String contenuto = ReadFile("user");
-            // Rimuovi le parentesi quadre (array JSON)
-            contenuto = contenuto.trim();
-            if (contenuto.startsWith("[") && contenuto.endsWith("]")) {
-                contenuto = contenuto.substring(1, contenuto.length() - 1).trim();
-            }
-
-            // Dividi il contenuto in singoli oggetti JSON (ogni oggetto è un utente)
-            String[] utentiJson = contenuto.split("\\},\\{");
-
-            // Crea una lista per memorizzare gli utenti
-            List<String> utenti = new ArrayList<>();
-            
-            // Elenco degli utenti
-            for (String utenteJson : utentiJson) {
-                // Aggiungi le parentesi graffe mancanti per ogni oggetto
-                utenteJson = "{" + utenteJson + "}";
-                utenti.add(utenteJson);
-            }
-
-            // Per ogni utente, estrai i dettagli
-            for (String utente : utenti) {
-                String nomeUtente = extractKey(utente, "username");
-                String password = extractKey(utente, "password");
-                // verifica utenti
-
-                System.out.println("user: " + nomeUtente);
-                System.out.println("pw: " + password);
-                System.out.println("----------");
-                if(nomeUtente.equals(user) && password.equals(pw)){
-                    ctrl=true;
-                }
-                if(nomeUtente.equals(user) && !password.equals(pw)){
-                    UExist=true;
+            boolean UExist = false;
+            try {
+                // Leggi il file JSON
+                String contenuto = ReadFile("user");
+                // Rimuovi le parentesi quadre (array JSON)
+                contenuto = contenuto.trim();
+                if (contenuto.startsWith("[") && contenuto.endsWith("]")) {
+                    contenuto = contenuto.substring(1, contenuto.length() - 1).trim();
                 }
 
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-         if(ctrl){
-            if(UExist){
-               
-            }else{
-                out.print("Benvenuto "+user+"\n");
-            }
-           
-         }else{
-            if(UExist){
-                out.print("Hai sbagliato la password! \n");
-            }else{
-                out.print("Non hai ancora un utente? nessun probelma te lo creo io! il tuo username è: "+user+"\n\n");
-                if(!user.equals("null") && !pw.equals("")) {  
-                    WriteFile(user, pw, "user");
-                    System.out.println("sono passato!");
+                // Dividi il contenuto in singoli oggetti JSON (ogni oggetto è un utente)
+                String[] utentiJson = contenuto.split("\\},\\{");
+
+                // Crea una lista per memorizzare gli utenti
+                List<String> utenti = new ArrayList<>();
+
+                // Elenco degli utenti
+                for (String utenteJson : utentiJson) {
+                    // Aggiungi le parentesi graffe mancanti per ogni oggetto
+                    utenteJson = "{" + utenteJson + "}";
+                    utenti.add(utenteJson);
                 }
+
+                // Per ogni utente, estrai i dettagli
+                for (String utente : utenti) {
+
+                    String nomeUtente = extractKey(utente, "username");
+                    String password = extractKey(utente, "password");
+                    String vitt = extractKey(utente, "vittorie");
+                    if (!vitt.equals("")) {
+                        win = win + Integer.parseInt(vitt);
+                    }
+
+                    // verifica utenti
+
+                    System.out.println("user: " + nomeUtente);
+                    System.out.println("pw: " + password);
+                    System.out.println("----------");
+                    if (nomeUtente.equals(user) && password.equals(pw)) {
+                        ctrl = true;
+                    }
+                    if (nomeUtente.equals(user) && !password.equals(pw)) {
+                        UExist = true;
+                    }
+
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-           
-                    
-         }
-       
-            
-            
+            if (ctrl) {
+                if (UExist) {
+
+                } else {
+                    out.print("Benvenuto " + user + "\n");
+                    userF = user;
+                }
+
+            } else {
+                if (UExist) {
+                    out.print("Hai sbagliato la password! \n");
+                } else {
+                    out.print("Non hai ancora un utente? nessun probelma te lo creo io! il tuo username è: " + user
+                            + "\n\n");
+                    userF = user;
+                    if (!user.equals("null") && !pw.equals("")) {
+                        WriteFile(user, pw, "user", 0);
+                        System.out.println("sono passato!");
+                    }
+                }
+
+            }
+
             // stampo il campo di gioco
             char[][] campo = StartGame();
             // lo riempio di nemici
@@ -385,9 +442,11 @@ public class Server_Socket {
                         } else {
                             if (finito[i][j] == '#') {
                                 out.print("👽");
-                              /*  if (j != 9) {
-                                    j++;
-                                } */
+                                /*
+                                 * if (j != 9) {
+                                 * j++;
+                                 * }
+                                 */
 
                             } else {
                                 out.print("🌟");
@@ -419,10 +478,12 @@ public class Server_Socket {
                                 } else {
                                     if (finito[i][j] == '#') {
                                         out.print("👽");
-                                      /*  if (j != 9) {
-                                            j++;
-                                        }*/
-                                        
+                                        /*
+                                         * if (j != 9) {
+                                         * j++;
+                                         * }
+                                         */
+
                                     } else {
                                         if (finito[i][j] == '-') {
                                             out.print("💣");
@@ -453,6 +514,10 @@ public class Server_Socket {
                 // verifica vittoria
                 if (check(finito)) {
                     out.println("Hai vinto!!!");
+                    win = win + 1;
+                    String vittoria = String.valueOf(win);
+                    System.out.println("ctrl controllo vittoria: "+vittoria);
+                    scrivi_vittoria(user, pw, vittoria);
                     a = false;
                     break;
                 }
