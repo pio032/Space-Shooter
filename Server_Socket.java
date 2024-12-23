@@ -1,5 +1,6 @@
 import java.io.*;
 import java.net.*;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -66,6 +67,7 @@ public class Server_Socket {
                 "  \"username\": \"" + username + "\",\n" +
                 "  \"password\": \"" + password + "\",\n" +
                 "  \"vittorie\": \"" + String.valueOf(win) + "\"\n" +
+
                 "}" + "]";
 
         // Scrivere nel file JSON
@@ -78,56 +80,45 @@ public class Server_Socket {
 
     }
 
-    // aggiunvi vittoria
-    public static void scrivi_vittoria(String username, String password, String win) {
-
-        // Pattern per cercare la chiave e il suo valore
-        String pattern = "\"vittorie\"\\s*:\\s*\"([^\"]+)\"";
-         
-        // Costruisci il nuovo valore JSON con la chiave aggiornata
-        System.out.println("eccomi: quello che ho ricevuto"+win);
-        String newJson = "{\n" +
-                "  \"username\": \"" + username + "\",\n" +
-                "  \"password\": \"" + password + "\",\n" +
-                "  \"vittorie\": \"" + String.valueOf(win) + "\"\n" +
-                "}";
-        System.out.println("eccomi: "+newJson);
-        upDateJson(newJson);
-
-    }
-
-    public static void upDateJson(String add) {
-        try {
-
+    // aggiungi vittoria, aggionra file json e cincrementa la vittoria
+    public static void updateWin(String username, String nuoveVittorie){
+          try {
             // Leggi il contenuto del file JSON come stringa
-            FileReader reader = new FileReader("./user.json");
-            StringBuilder jsonContent = new StringBuilder();
-            int i;
-            while ((i = reader.read()) != -1) {
-                jsonContent.append((char) i);
+            File file = new File("user.json");
+            String jsonString = new String(Files.readAllBytes(file.toPath()));
+
+            // Trova la parte corrispondente all'utente con lo username specificato
+            int startIndex = jsonString.indexOf("\"username\": \"" + username + "\"");
+
+            if (startIndex != -1) {
+                // Trova l'inizio e la fine del campo "vittorie" per quell'utente
+                int vittorieIndex = jsonString.indexOf("\"vittorie\":", startIndex);
+                if (vittorieIndex != -1) {
+                    // Trova la fine del valore di vittorie
+                    int endVittorieIndex = jsonString.indexOf(",", vittorieIndex);
+                    if (endVittorieIndex == -1) {
+                        endVittorieIndex = jsonString.indexOf("}", vittorieIndex);
+                    }
+
+                    // Costruisci la nuova stringa con il valore aggiornato
+                    String updatedJsonString = jsonString.substring(0, vittorieIndex + 11) // fino a "vittorie":
+                            + "\"" + nuoveVittorie + "\"" // nuovo valore di vittorie
+                            + jsonString.substring(endVittorieIndex); // il resto della stringa
+
+                    // Scrive la stringa aggiornata nel file
+                    Files.write(file.toPath(), updatedJsonString.getBytes());
+
+                    System.out.println("Vittorie aggiornate per l'utente " + username);
+                }
+            } else {
+                System.out.println("Utente non trovato: " + username);
             }
-            reader.close();
-
-            // Converti il contenuto in una stringa
-            String jsonString = jsonContent.toString();
-
-            // Crea un pattern per trovare la chiave e il valore
-            String pattern = "(\"" + "vittorie" + "\")\\s*:\\s*\"([^\"]+)\"";
-
-            // Sostituisci il vecchio valore con il nuovo valore
-            String updatedJson = jsonString.replaceAll(pattern, add);
-
-            // Scrivi la stringa aggiornata nel file JSON
-            FileWriter writer = new FileWriter("./user.json");
-            writer.write(updatedJson);
-            writer.close();
-
-            System.out.println("File JSON aggiornato con successo!");
-
         } catch (IOException e) {
             e.printStackTrace();
         }
+
     }
+
 
     // verifica esistenza file utente, caso contrario lo crea
     public static void CreationFile(String usr) throws IOException {
@@ -164,6 +155,8 @@ public class Server_Socket {
         }
         return valore;
     }
+
+    // SPOSTAMENTI NAVICELLA E CAMPO  !!
 
     public static char[][] scendi(char[][] campo) {
         for (int i = 0; i < 10; i++) {
@@ -367,7 +360,7 @@ public class Server_Socket {
                 // Dividi il contenuto in singoli oggetti JSON (ogni oggetto è un utente)
                 String[] utentiJson = contenuto.split("\\},\\{");
 
-                // Crea una lista per memorizzare gli utenti
+                // Creo una lista per memorizzare gli utenti
                 List<String> utenti = new ArrayList<>();
 
                 // Elenco degli utenti
@@ -435,9 +428,7 @@ public class Server_Socket {
                     for (int j = 0; j < 10; j++) {
                         if (finito[i][j] == '@') {
                             out.print("🚀");
-                            if (j != 9) {
-                                j++;
-                            }
+                            
 
                         } else {
                             if (finito[i][j] == '#') {
@@ -517,7 +508,8 @@ public class Server_Socket {
                     win = win + 1;
                     String vittoria = String.valueOf(win);
                     System.out.println("ctrl controllo vittoria: "+vittoria);
-                    scrivi_vittoria(user, pw, vittoria);
+                    //invio dei dati al metodo
+                    updateWin(user, String.valueOf(win));
                     a = false;
                     break;
                 }
