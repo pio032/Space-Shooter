@@ -381,10 +381,11 @@ public class Server_Socket {
                     }
 
                     // verifica utenti
-
+                    /*
                     System.out.println("user: " + nomeUtente);
                     System.out.println("pw: " + password);
                     System.out.println("----------");
+                     */
                     if (nomeUtente.equals(user) && password.equals(pw)) {
                         ctrl = true;
                     }
@@ -397,11 +398,10 @@ public class Server_Socket {
                 e.printStackTrace();
             }
             if (ctrl) {
-                if (UExist) {
-
-                } else {
+                if (!UExist) {
                     out.print("Benvenuto " + user + "\n");
                     userF = user;
+                    out.print("il numero delle tur vittorie è: "+win+"\n");
                 }
 
             } else {
@@ -413,7 +413,7 @@ public class Server_Socket {
                     userF = user;
                     if (!user.equals("null") && !pw.equals("")) {
                         WriteFile(user, pw, "user", 0);
-                        System.out.println("sono passato!");
+                        
                     }
                 }
 
@@ -451,7 +451,7 @@ public class Server_Socket {
                 }
                 // in utente
                 String clientMessage = (String) in.readLine();
-                System.out.println(clientMessage);
+               
                 if (!clientMessage.equals(" ")) {
                     // sposto navicella
                     finito = updateCampo(finito, clientMessage);
@@ -506,8 +506,7 @@ public class Server_Socket {
                 if (check(finito)) {
                     out.println("Hai vinto!!!");
                     win = win + 1;
-                    String vittoria = String.valueOf(win);
-                    System.out.println("ctrl controllo vittoria: "+vittoria);
+                    
                     //invio dei dati al metodo
                     updateWin(user, String.valueOf(win));
                     a = false;
