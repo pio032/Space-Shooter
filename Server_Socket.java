@@ -198,7 +198,7 @@ public class Server_Socket {
 
     // generzioneNemici
     public static char[][] gen(char[][] campo) {
-        for (int i = 0; i < 25; i++) {
+        for (int i = 0; i < 1; i++) {
             int c = (int) (Math.random() * 10);
             int r = (int) (Math.random() * 5);
             if (campo[r][c] == '#') {
@@ -319,209 +319,287 @@ public class Server_Socket {
             return false;
         }
     }
+    //creazione class handler
+    public static class ClientHandler implements Runnable {
+        private Socket clientSocket;
+
+        public ClientHandler(Socket clientSocket) {
+            this.clientSocket = clientSocket;
+        }
+        //thread run
+        @Override
+        public void run() {
+            try (PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
+            BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()))) {
+           boolean a = true;
+           String userF = "";
+           int win = 0;
+
+           // LOGIN
+           out.print("Ciao! Dimmi il tuo nome utente: \n");
+           out.flush();
+           String user = in.readLine();
+           out.print("Ciao! Dimmi la tua password: \n");
+           out.flush();
+           String pw = in.readLine();
+
+           // Verifica se l'utente esiste
+           boolean ctrl = false;
+           boolean UExist = false;
+           try {
+               String contenuto = ReadFile("user");
+               contenuto = contenuto.trim();
+               if (contenuto.startsWith("[") && contenuto.endsWith("]")) {
+                   contenuto = contenuto.substring(1, contenuto.length() - 1).trim();
+               }
+
+               String[] utentiJson = contenuto.split("\\},\\{");
+               List<String> utenti = new ArrayList<>();
+               for (String utenteJson : utentiJson) {
+                   utenteJson = "{" + utenteJson + "}";
+                   utenti.add(utenteJson);
+               }
+
+               for (String utente : utenti) {
+                   String nomeUtente = extractKey(utente, "username");
+                   String password = extractKey(utente, "password");
+                   String vitt = extractKey(utente, "vittorie");
+                   if (!vitt.equals("")) {
+                       win = win + Integer.parseInt(vitt);
+                   }
+
+                   if (nomeUtente.equals(user) && password.equals(pw)) {
+                       ctrl = true;
+                   }
+                   if (nomeUtente.equals(user) && !password.equals(pw)) {
+                       UExist = true;
+                   }
+               }
+           } catch (IOException e) {
+               e.printStackTrace();
+           }
+
+           if (ctrl) {
+               if (!UExist) {
+                   out.print("Benvenuto " + user + "\n");
+                   userF = user;
+                   out.print("Il numero delle tue vittorie è: " + win + "\n");
+               }
+           } else {
+               if (UExist) {
+                   out.print("Hai sbagliato la password! \n");
+               } else {
+                   out.print("Non hai ancora un utente? Nessun problema, te lo creo io! Il tuo username è: " + user + "\n\n");
+                   userF = user;
+                   if (!user.equals("null") && !pw.equals("")) {
+                       WriteFile(user, pw, "user", 0);
+                   }
+               }
+           }
+           try {
+            // Leggi il file JSON
+            String contenuto = ReadFile("user");
+            // Rimuovi le parentesi quadre (array JSON)
+            contenuto = contenuto.trim();
+            if (contenuto.startsWith("[") && contenuto.endsWith("]")) {
+                contenuto = contenuto.substring(1, contenuto.length() - 1).trim();
+            }
+
+            // Dividi il contenuto in singoli oggetti JSON (ogni oggetto è un utente)
+            String[] utentiJson = contenuto.split("\\},\\{");
+
+            // Creo una lista per memorizzare gli utenti
+            List<String> utenti = new ArrayList<>();
+
+            // Elenco degli utenti
+            for (String utenteJson : utentiJson) {
+                // Aggiungi le parentesi graffe mancanti per ogni oggetto
+                utenteJson = "{" + utenteJson + "}";
+                utenti.add(utenteJson);
+            }
+
+            // Per ogni utente, estrai i dettagli
+            for (String utente : utenti) {
+
+                String nomeUtente = extractKey(utente, "username");
+                String password = extractKey(utente, "password");
+                String vitt = extractKey(utente, "vittorie");
+                if (!vitt.equals("")) {
+                    win = win + Integer.parseInt(vitt);
+                }
+
+                // verifica utenti
+                /*
+                System.out.println("user: " + nomeUtente);
+                System.out.println("pw: " + password);
+                System.out.println("----------");
+                 */
+                if (nomeUtente.equals(user) && password.equals(pw)) {
+                    ctrl = true;
+                }
+                if (nomeUtente.equals(user) && !password.equals(pw)) {
+                    UExist = true;
+                }
+
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        if (ctrl) {
+            if (!UExist) {
+                out.print("Benvenuto " + user + "\n");
+                userF = user;
+                out.print("il numero delle tur vittorie è: "+win+"\n");
+            }
+
+        } else {
+            if (UExist) {
+                out.print("Hai sbagliato la password! \n");
+            } else {
+                out.print("Non hai ancora un utente? nessun probelma te lo creo io! il tuo username è: " + user
+                        + "\n\n");
+                userF = user;
+                if (!user.equals("null") && !pw.equals("")) {
+                    WriteFile(user, pw, "user", 0);
+                    
+                }
+            }
+
+        }
+
+        // stampo il campo di gioco
+        char[][] campo = StartGame();
+        // lo riempio di nemici
+        char[][] finito = gen(campo);
+        while (a) {
+            for (int i = 0; i < 10; i++) {
+                for (int j = 0; j < 10; j++) {
+                    if (finito[i][j] == '@') {
+                        out.print("🚀");
+                        
+
+                    } else {
+                        if (finito[i][j] == '#') {
+                            out.print("👽");
+                            /*
+                             * if (j != 9) {
+                             * j++;
+                             * }
+                             */
+
+                        } else {
+                            out.print("🌟");
+
+                        }
+
+                    }
+
+                }
+                out.println();
+            }
+            // in utente
+            String clientMessage = (String) in.readLine();
+           
+            if (!clientMessage.equals(" ")) {
+                // sposto navicella
+                finito = updateCampo(finito, clientMessage);
+            } else {
+                // colpo
+                finito = shot(finito);
+                // sale il colpo
+                while (!colpo) {
+                    finito = colpisci_nemico(finito);
+                    for (int i = 0; i < 10; i++) {
+                        for (int j = 0; j < 10; j++) {
+                            if (finito[i][j] == '@') {
+                                out.print("🚀");
+
+                            } else {
+                                if (finito[i][j] == '#') {
+                                    out.print("👽");
+                                    /*
+                                     * if (j != 9) {
+                                     * j++;
+                                     * }
+                                     */
+
+                                } else {
+                                    if (finito[i][j] == '-') {
+                                        out.print("💣");
+                                    } else {
+                                        out.print("🌟");
+                                    }
+
+                                }
+
+                            }
+                        }
+                        out.println();
+                    }
+                    Thread.sleep(900);
+                    out.println();
+                    out.println();
+                }
+                colpo = false;
+            }
+
+            finito = scendi(finito);
+            // conotrollo perdita
+            if (lose) {
+                a = false;
+                out.println("mi dispiace hai perso, i nemici sono arrivati fino alla fine!");
+            }
+            Thread.sleep(1000);
+            // verifica vittoria
+            if (check(finito)) {
+                out.println("Hai vinto!!!");
+                win = win + 1;
+                
+                //invio dei dati al metodo
+                updateWin(user, String.valueOf(win));
+                a = false;
+                break;
+            }
+        }
+
+        // Chiudi le connessioni e gli stream
+           this.clientSocket.close();
+        
+   }        catch (IOException ex) {
+            } catch (InterruptedException ex) {
+            }
+   
+}
+}
+
+        
 
     // MAIN
     public static void main(String[] args) throws InterruptedException, IOException {
         // Porta su cui il server ascolta
         int port = 1234;
-        boolean a = true;
-        // creazione del file
-        CreationFile("user");
-        int win = 0;
         try {
             // Crea un ServerSocket che ascolta sulla porta specificata
             ServerSocket serverSocket = new ServerSocket(port);
             System.out.println("Server in ascolto sulla porta " + port);
-            // Il server attende che un client si connetta
-            Socket clientSocket = serverSocket.accept();
-            System.out.println("Client connesso da " + clientSocket.getInetAddress());
-            PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
-            BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-            String userF = "";
-            // LOGIN
-            out.print("Ciao! Dimmi il tuo nome utente: \n");
-            out.flush(); // Forza il flush del buffer per stampare subito il messaggio
-            String user = in.readLine();
-            out.print("Ciao! Dimmi la tua password: \n");
-            out.flush(); // Forza il flush del buffer per stampare subito il messaggio
-            String pw = (String) in.readLine();
-            // lettura di piu utenti dal file json
-            boolean ctrl = false;
-            boolean UExist = false;
-            try {
-                // Leggi il file JSON
-                String contenuto = ReadFile("user");
-                // Rimuovi le parentesi quadre (array JSON)
-                contenuto = contenuto.trim();
-                if (contenuto.startsWith("[") && contenuto.endsWith("]")) {
-                    contenuto = contenuto.substring(1, contenuto.length() - 1).trim();
-                }
 
-                // Dividi il contenuto in singoli oggetti JSON (ogni oggetto è un utente)
-                String[] utentiJson = contenuto.split("\\},\\{");
-
-                // Creo una lista per memorizzare gli utenti
-                List<String> utenti = new ArrayList<>();
-
-                // Elenco degli utenti
-                for (String utenteJson : utentiJson) {
-                    // Aggiungi le parentesi graffe mancanti per ogni oggetto
-                    utenteJson = "{" + utenteJson + "}";
-                    utenti.add(utenteJson);
-                }
-
-                // Per ogni utente, estrai i dettagli
-                for (String utente : utenti) {
-
-                    String nomeUtente = extractKey(utente, "username");
-                    String password = extractKey(utente, "password");
-                    String vitt = extractKey(utente, "vittorie");
-                    if (!vitt.equals("")) {
-                        win = win + Integer.parseInt(vitt);
-                    }
-
-                    // verifica utenti
-                    /*
-                    System.out.println("user: " + nomeUtente);
-                    System.out.println("pw: " + password);
-                    System.out.println("----------");
-                     */
-                    if (nomeUtente.equals(user) && password.equals(pw)) {
-                        ctrl = true;
-                    }
-                    if (nomeUtente.equals(user) && !password.equals(pw)) {
-                        UExist = true;
-                    }
-
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            if (ctrl) {
-                if (!UExist) {
-                    out.print("Benvenuto " + user + "\n");
-                    userF = user;
-                    out.print("il numero delle tur vittorie è: "+win+"\n");
-                }
-
-            } else {
-                if (UExist) {
-                    out.print("Hai sbagliato la password! \n");
-                } else {
-                    out.print("Non hai ancora un utente? nessun probelma te lo creo io! il tuo username è: " + user
-                            + "\n\n");
-                    userF = user;
-                    if (!user.equals("null") && !pw.equals("")) {
-                        WriteFile(user, pw, "user", 0);
-                        
-                    }
-                }
-
+            // Accetta nuove connessioni e gestisci ogni connessione con un nuovo thread
+            while (true) {
+                Socket clientSocket = serverSocket.accept();
+                System.out.println("Client connesso da " + clientSocket.getInetAddress());
+                Thread clientThread = new Thread(new ClientHandler(clientSocket));
+                clientThread.start();
             }
 
-            // stampo il campo di gioco
-            char[][] campo = StartGame();
-            // lo riempio di nemici
-            char[][] finito = gen(campo);
-            while (a) {
-                for (int i = 0; i < 10; i++) {
-                    for (int j = 0; j < 10; j++) {
-                        if (finito[i][j] == '@') {
-                            out.print("🚀");
-                            
-
-                        } else {
-                            if (finito[i][j] == '#') {
-                                out.print("👽");
-                                /*
-                                 * if (j != 9) {
-                                 * j++;
-                                 * }
-                                 */
-
-                            } else {
-                                out.print("🌟");
-
-                            }
-
-                        }
-
-                    }
-                    out.println();
-                }
-                // in utente
-                String clientMessage = (String) in.readLine();
-               
-                if (!clientMessage.equals(" ")) {
-                    // sposto navicella
-                    finito = updateCampo(finito, clientMessage);
-                } else {
-                    // colpo
-                    finito = shot(finito);
-                    // sale il colpo
-                    while (!colpo) {
-                        finito = colpisci_nemico(finito);
-                        for (int i = 0; i < 10; i++) {
-                            for (int j = 0; j < 10; j++) {
-                                if (finito[i][j] == '@') {
-                                    out.print("🚀");
-
-                                } else {
-                                    if (finito[i][j] == '#') {
-                                        out.print("👽");
-                                        /*
-                                         * if (j != 9) {
-                                         * j++;
-                                         * }
-                                         */
-
-                                    } else {
-                                        if (finito[i][j] == '-') {
-                                            out.print("💣");
-                                        } else {
-                                            out.print("🌟");
-                                        }
-
-                                    }
-
-                                }
-                            }
-                            out.println();
-                        }
-                        Thread.sleep(900);
-                        out.println();
-                        out.println();
-                    }
-                    colpo = false;
-                }
-
-                finito = scendi(finito);
-                // conotrollo perdita
-                if (lose) {
-                    a = false;
-                    out.println("mi dispiace hai perso, i nemici sono arrivati fino alla fine!");
-                }
-                Thread.sleep(1000);
-                // verifica vittoria
-                if (check(finito)) {
-                    out.println("Hai vinto!!!");
-                    win = win + 1;
-                    
-                    //invio dei dati al metodo
-                    updateWin(user, String.valueOf(win));
-                    a = false;
-                    break;
-                }
-            }
-
-            // Chiudi le connessioni e gli stream
-            in.close();
-            out.close();
-            clientSocket.close();
-            serverSocket.close();
-            System.out.println("Connessione chiusa.");
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 }
+
+
+
+
+
+   
+    
