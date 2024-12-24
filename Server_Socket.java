@@ -102,10 +102,16 @@ public class Server_Socket {
 
                     // Costruisci la nuova stringa con il valore aggiornato
                     String updatedJsonString = jsonString.substring(0, vittorieIndex + 11) // fino a "vittorie":
-                            + "\"" + nuoveVittorie + "\"" // nuovo valore di vittorie
+                            + "\"" + nuoveVittorie + "\"" +"}" // nuovo valore di vittorie
                             + jsonString.substring(endVittorieIndex); // il resto della stringa
 
                     // Scrive la stringa aggiornata nel file
+                    String definitiva = "";
+                    for(int i =0; i<updatedJsonString.length(); i++){
+                        if(i!=updatedJsonString.length()-2){
+                        definitiva=definitiva+updatedJsonString.charAt(i);
+                    }
+                    }
                     Files.write(file.toPath(), updatedJsonString.getBytes());
 
                     System.out.println("Vittorie aggiornate per l'utente " + username);
@@ -568,7 +574,7 @@ public class Server_Socket {
                     out.println("ok riniziamo! \n"); 
                     a=true;   
                     }else{
-                    out.print("va bene, alla prossima! \n");
+                    out.println("va bene, alla prossima! \n");
                     scelta=false;
                     a=false;
                     this.clientSocket.close();
