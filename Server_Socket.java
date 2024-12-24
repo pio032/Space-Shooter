@@ -89,7 +89,7 @@ public class Server_Socket {
 
             // Trova la parte corrispondente all'utente con lo username specificato
             int startIndex = jsonString.indexOf("\"username\": \"" + username + "\"");
-
+                        
             if (startIndex != -1) {
                 // Trova l'inizio e la fine del campo "vittorie" per quell'utente
                 int vittorieIndex = jsonString.indexOf("\"vittorie\":", startIndex);
@@ -99,9 +99,12 @@ public class Server_Socket {
                     if (endVittorieIndex == -1) {
                         endVittorieIndex = jsonString.indexOf("}", vittorieIndex);
                     }
+                     int x = Integer.parseInt(nuoveVittorie);
+                     x = x-1;
+                     System.out.println("v index"+vittorieIndex);
 
                     // Costruisci la nuova stringa con il valore aggiornato
-                    String updatedJsonString = jsonString.substring(0, vittorieIndex + 11) // fino a "vittorie":
+                    String updatedJsonString = jsonString.substring(x, vittorieIndex + 11) // fino a "vittorie":
                             + "\"" + nuoveVittorie + "\"" +"}" // nuovo valore di vittorie
                             + jsonString.substring(endVittorieIndex); // il resto della stringa
 
@@ -110,6 +113,9 @@ public class Server_Socket {
                     for(int i =0; i<updatedJsonString.length(); i++){
                         if(i!=updatedJsonString.length()-2){
                         definitiva=definitiva+updatedJsonString.charAt(i);
+                    }
+                    if (i==0) {
+                        definitiva="["+definitiva+updatedJsonString.charAt(i);    
                     }
                     }
                     Files.write(file.toPath(), updatedJsonString.getBytes());
@@ -148,7 +154,8 @@ public class Server_Socket {
         }
         return contenuto.toString();
     }
-
+     
+      //estrai la key dalla stringa
     public static String extractKey(String estratto, String key) {
         String pattern = "\"" + key + "\"\\s*:\\s*\"([^\"]+)\"";
         String valore = "";
