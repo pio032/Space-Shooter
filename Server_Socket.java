@@ -1,8 +1,6 @@
 import java.io.*;
 import java.net.*;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.List;
 
 public class Server_Socket {
 
@@ -85,6 +83,62 @@ public class Server_Socket {
         }
 
     }
+    //VERIFICA L ESISTENZA DI UN UTENTE E NEL CASO NON CI FOSSE LI CREA IL FILE!
+     public static boolean UserExist(String username){
+     boolean tr=false;
+     String path = "./"+username+".json";
+     File a = new File(path);
+     if(a.exists()){
+     tr=true;
+     }else{
+    try {
+        a.createNewFile();
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
+     }
+     return tr;
+     }
+
+    public static boolean login(String username, String pw){
+    boolean tr = false;
+            // Percorso del file JSON
+            String filePath = "./"+username+".json";
+        
+            // Leggi il file come una stringa
+            try {
+                String jsonString = new String(Files.readAllBytes(new File(filePath).toPath()));
+                
+                // Rimuovere i caratteri inutili (es. spazi e parentesi)
+                jsonString = jsonString.trim();
+                
+                // Rimuoviamo le parentesi graffe
+                jsonString = jsonString.substring(1, jsonString.length() - 1).trim();
+                
+                // Separiamo le coppie chiave-valore
+                String[] pairs = jsonString.split(",");
+                System.out.println("eccomi qui! sono io");
+                for (String pair : pairs) {
+                    // Separiamo la chiave dal valore
+                    String[] keyValue = pair.split(":");
+                    
+                    // Rimuoviamo gli spazi e i doppi apici
+                    String key = keyValue[0].trim().replaceAll("\"", "");
+                    String value = keyValue[1].trim().replaceAll("\"", "");
+                    
+                    // Stampa la chiave e il valore
+                    System.out.println(key + ": " + value);
+                    if(key.equals(pw) && value.equals(username)){
+                        tr = true;
+                    }
+                }
+            } catch (IOException e) {
+                System.out.println("Errore nella lettura del file JSON: " + e.getMessage());
+            }
+    return tr;
+    }
+
+
 
     // leggo dal file json
     public static String ReadFile(String usr) throws IOException {
@@ -300,132 +354,32 @@ public class Server_Socket {
                 out.print("Ciao! Dimmi la tua password: \n");
                 out.flush();
                 String pw = in.readLine();
-
+                boolean scelta = false;
                 // Verifica se l'utente esiste
-                boolean ctrl = false;
-                boolean UExist = false;
-                try {
-                    String contenuto = ReadFile(user+".json");
-                    contenuto = contenuto.trim();
-                    if (contenuto.startsWith("[") && contenuto.endsWith("]")) {
-                        contenuto = contenuto.substring(1, contenuto.length() - 1).trim();
-                    }
-
-                    String[] utentiJson = contenuto.split("\\},\\{");
-                    List<String> utenti = new ArrayList<>();
-                    for (String utenteJson : utentiJson) {
-                        utenteJson = "{" + utenteJson + "}";
-                        utenti.add(utenteJson);
-                    }
-
-                    for (String utente : utenti) {
-                        String nomeUtente = extractKey(utente, "username");
-                        String password = extractKey(utente, "password");
-                        String vitt = extractKey(utente, "vittorie");
-                        if (!vitt.equals("")) {
-                            win = win + Integer.parseInt(vitt);
-                        }
-
-                        if (nomeUtente.equals(user) && password.equals(pw)) {
-                            ctrl = true;
-                        }
-                        if (nomeUtente.equals(user) && !password.equals(pw)) {
-                            UExist = true;
-                        }
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-                if (ctrl) {
-                    if (!UExist) {
-                        out.print("Benvenuto " + user + "\n");
-                        userF = user;
-                        out.print("Il numero delle tue vittorie è: " + win + "\n");
-                    }
-                } else {
-                    if (UExist) {
-                        out.print("Hai sbagliato la password! \n");
-                    } else {
-                        out.print("Non hai ancora un utente? Nessun problema, te lo creo io! Il tuo username è: " + user
-                                + "\n\n");
-                        userF = user;
+                if(UserExist(user)){
+               if(login(user, pw)){
+                //login avvenuto con successo
+                out.print("Benvenuto " + user + "\n");
+                userF = user;
+                out.print("Il numero delle tue vittorie è: " + win + "\n");
+                 scelta = true;
+               }else{
+                //login fail la password è sbagliata
+                out.print("Hai sbagliato la password! rieffetua il login \n");
+                 scelta = false;
+               }
+                }else{
+                    out.print("Non hai ancora un utente? Nessun problema, te lo creo io! Il tuo username è: " + user
+                    + "\n\n");
+                    userF = user;
                         if (!user.equals("null") && !pw.equals("")) {
                             WriteFile(user, pw, user, 0);
                         }
-                    }
+                         scelta = true;
                 }
-                try {
-                    // Leggi il file JSON
-                    String contenuto = ReadFile(user);
-                    // Rimuovi le parentesi quadre (array JSON)
-                    contenuto = contenuto.trim();
-                    if (contenuto.startsWith("[") && contenuto.endsWith("]")) {
-                        contenuto = contenuto.substring(1, contenuto.length() - 1).trim();
-                    }
 
-                    // Dividi il contenuto in singoli oggetti JSON (ogni oggetto è un utente)
-                    String[] utentiJson = contenuto.split("\\},\\{");
-
-                    // Creo una lista per memorizzare gli utenti
-                    List<String> utenti = new ArrayList<>();
-
-                    // Elenco degli utenti
-                    for (String utenteJson : utentiJson) {
-                        // Aggiungi le parentesi graffe mancanti per ogni oggetto
-                        utenteJson = "{" + utenteJson + "}";
-                        utenti.add(utenteJson);
-                    }
-
-                    // Per ogni utente, estrai i dettagli
-                    for (String utente : utenti) {
-
-                        String nomeUtente = extractKey(utente, "username");
-                        String password = extractKey(utente, "password");
-                        String vitt = extractKey(utente, "vittorie");
-                        if (!vitt.equals("")) {
-                            win = win + Integer.parseInt(vitt);
-                        }
-
-                        // verifica utenti
-                        /*
-                         * System.out.println("user: " + nomeUtente);
-                         * System.out.println("pw: " + password);
-                         * System.out.println("----------");
-                         */
-                        if (nomeUtente.equals(user) && password.equals(pw)) {
-                            ctrl = true;
-                        }
-                        if (nomeUtente.equals(user) && !password.equals(pw)) {
-                            UExist = true;
-                        }
-
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                if (ctrl) {
-                    if (!UExist) {
-                        out.print("Benvenuto " + user + "\n");
-                        userF = user;
-                        out.print("il numero delle tur vittorie è: " + win + "\n");
-                    }
-
-                } else {
-                    if (UExist) {
-                        out.print("Hai sbagliato la password! \n");
-                    } else {
-                        out.print("Non hai ancora un utente? nessun probelma te lo creo io! il tuo username è: " + user
-                                + "\n\n");
-                        userF = user;
-                        if (!user.equals("null") && !pw.equals("")) {
-                            WriteFile(user, pw, user+".json", 0);
-
-                        }
-                    }
-
-                }
-                boolean scelta = true;
+              
+               
                 while (scelta) { 
                 System.out.println("sini di nuovo qua!");    
                 
