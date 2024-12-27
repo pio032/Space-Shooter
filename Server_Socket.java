@@ -12,58 +12,13 @@ public class Server_Socket {
 
     // scrittra messaggi sul file
     public static void WriteFile(String username, String password, String nome, int win) throws IOException {
-        String[] users;
-        String completa = "";
-        try {
-            // Leggi il file JSON
-            String contenuto = ReadFile("user");
-            // Rimuovi le parentesi quadre (array JSON)
-            contenuto = contenuto.trim();
-            if (contenuto.startsWith("[") && contenuto.endsWith("]")) {
-                contenuto = contenuto.substring(1, contenuto.length() - 1).trim();
-            }
-
-            // Dividi il contenuto in singoli oggetti JSON (ogni oggetto è un utente)
-            String[] utentiJson = contenuto.split("\\},\\{");
-
-            // Crea una lista per memorizzare gli utenti
-            List<String> utenti = new ArrayList<>();
-
-            // Elenco degli utenti
-            for (String utenteJson : utentiJson) {
-                // Aggiungi le parentesi graffe mancanti per ogni oggetto
-                utenteJson = "{" + utenteJson + "}";
-                utenti.add(utenteJson);
-            }
-
-            // Per ogni utente, estrai i dettagli
-            System.out.println(utenti.size() * 2);
-
-            // verifica dati
-            /*
-             * System.out.println("user: " + nomeUtente);
-             * System.out.println("pw: " + password);
-             * System.out.println("----------");
-             */
-
-            for (int j = 0; j < utenti.size(); j++) {
-                String utente = utenti.get(j);
-                completa = completa + "{\n" +
-                        "  \"username\": \"" + extractKey(utente, "username") + "\",\n" +
-                        "  \"password\": \"" + extractKey(utente, "password") + "\",\n" +
-                        "  \"vittorie\": \"" + extractKey(utente, "win") + "\"\n" +
-                        "},";
-
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+     
         /*
          * leggo il file, concateno la stringa e riscrivo --> stesso codice che ho nel
          * main per la lettura
          */
 
-        String jsonContent = "[" + completa + "{\n" +
+        String jsonContent = "[" + "{\n" +
                 "  \"username\": \"" + username + "\",\n" +
                 "  \"password\": \"" + password + "\",\n" +
                 "  \"vittorie\": \"" + String.valueOf(win) + "\"\n" +
@@ -84,7 +39,7 @@ public class Server_Socket {
     public static void updateWin(String username, String nuoveVittorie) {
         try {
             // Leggi il contenuto del file JSON come stringa
-            File file = new File("user.json");
+            File file = new File(username+".json");
             String jsonString = new String(Files.readAllBytes(file.toPath()));
 
             // Trova la parte corrispondente all'utente con lo username specificato
@@ -131,20 +86,9 @@ public class Server_Socket {
 
     }
 
-    // verifica esistenza file utente, caso contrario lo crea
-    public static void CreationFile(String usr) throws IOException {
-        // String path = "C:\\Users\\PietroArdizzone\\OneDrive - ITS Angelo
-        // Rizzoli\\Documenti\\ProgettiVsCode\\progetto_UFS02";
-        usr = "./" + usr + ".json";
-        File a = new File(usr);
-        if (!a.exists()) {
-            FileWriter writer = new FileWriter(usr, true);
-        }
-    }
-
     // leggo dal file json
     public static String ReadFile(String usr) throws IOException {
-        usr = "./" + "user" + ".json";
+        usr = "./" + usr + ".json";
         StringBuilder contenuto = new StringBuilder(); // oggetto lettura
         try (BufferedReader reader = new BufferedReader(new FileReader(usr))) {
             String line;
@@ -361,7 +305,7 @@ public class Server_Socket {
                 boolean ctrl = false;
                 boolean UExist = false;
                 try {
-                    String contenuto = ReadFile("user.json");
+                    String contenuto = ReadFile(user+".json");
                     contenuto = contenuto.trim();
                     if (contenuto.startsWith("[") && contenuto.endsWith("]")) {
                         contenuto = contenuto.substring(1, contenuto.length() - 1).trim();
@@ -407,13 +351,13 @@ public class Server_Socket {
                                 + "\n\n");
                         userF = user;
                         if (!user.equals("null") && !pw.equals("")) {
-                            WriteFile(user, pw, "user", 0);
+                            WriteFile(user, pw, user, 0);
                         }
                     }
                 }
                 try {
                     // Leggi il file JSON
-                    String contenuto = ReadFile("user");
+                    String contenuto = ReadFile(user);
                     // Rimuovi le parentesi quadre (array JSON)
                     contenuto = contenuto.trim();
                     if (contenuto.startsWith("[") && contenuto.endsWith("]")) {
@@ -475,7 +419,7 @@ public class Server_Socket {
                                 + "\n\n");
                         userF = user;
                         if (!user.equals("null") && !pw.equals("")) {
-                            WriteFile(user, pw, "user", 0);
+                            WriteFile(user, pw, user+".json", 0);
 
                         }
                     }
