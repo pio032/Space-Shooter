@@ -165,7 +165,13 @@ public class Server_Socket {
         }
         return valore;
     }
-
+    /*
+     * 
+     * 
+     * INIZIO   DEL     GIOCO   
+     * 
+     * 
+     */
     // SPOSTAMENTI NAVICELLA E CAMPO !!
 
     public static char[][] scendi(char[][] campo) {
@@ -208,9 +214,9 @@ public class Server_Socket {
 
     // generzioneNemici
     public static char[][] gen(char[][] campo) {
-        for (int i = 0; i < 1; i++) {
-            int c = (int) (Math.random() * 10);
-            int r = (int) (Math.random() * 5);
+        for (int i = 0; i < 1; i++) { 
+            int c = (int) (Math.random() * 10); // 0 a 9
+            int r = (int) (Math.random() * 5);  // 0 a 4
             if (campo[r][c] == '#') {
                 i--;
             } else {
@@ -273,10 +279,10 @@ public class Server_Socket {
             for (int j = 0; j < 10; j++) {
                 if (campo[i][j] == '@') {
                     if (campo[i - 1][j] == '#') {
-                        campo[i - 1][j] = '.';
+                        campo[i - 1][j] = '.'; // tolgo l alieno e metto una stella
                         colpo = true;
                     } else {
-                        campo[i - 1][j] = '-';
+                        campo[i - 1][j] = '-'; // se non c'è alieno compare la bomba, SEMPRE PENULTIMA RIGA
                     }
 
                 }
@@ -329,7 +335,9 @@ public class Server_Socket {
             return false;
         }
     }
-
+     /*
+      *         THREAD & NETWORK
+      */
     // creazione class handler
     public static class ClientHandler implements Runnable {
         private Socket clientSocket;
