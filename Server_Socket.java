@@ -34,6 +34,7 @@ public class Server_Socket {
     }
 
     // aggiungi vittoria, aggionra file json e cincrementa la vittoria
+    //DA RIVEDERE 
     public static void updateWin(String username, String nuoveVittorie) {
         try {
             // Leggi il contenuto del file JSON come stringa
@@ -46,38 +47,20 @@ public class Server_Socket {
             if (startIndex != -1) {
                 // Trova l'inizio e la fine del campo "vittorie" per quell'utente
                 int vittorieIndex = jsonString.indexOf("\"vittorie\":", startIndex);
-                if (vittorieIndex != -1) {
-                    // Trova la fine del valore di vittorie
-                    int endVittorieIndex = jsonString.indexOf(",", vittorieIndex);
-                    if (endVittorieIndex == -1) {
-                        endVittorieIndex = jsonString.indexOf("}", vittorieIndex);
-                    }
-                     int x = Integer.parseInt(nuoveVittorie);
-                     x = x-1;
-                     System.out.println("v index"+vittorieIndex);
-
+               
                     // Costruisci la nuova stringa con il valore aggiornato
-                    String updatedJsonString = jsonString.substring(x, vittorieIndex + 11) // fino a "vittorie":
-                            + "\"" + nuoveVittorie + "\"" +"}" // nuovo valore di vittorie
-                            + jsonString.substring(endVittorieIndex); // il resto della stringa
+                    int x = Integer.parseInt(nuoveVittorie);
+                    String updatedJsonString = "["+"{"+jsonString.substring(x, vittorieIndex + 11) // fino a "vittorie":
+                            + "\"" + nuoveVittorie + "\"" +"}"+"]";  // nuovo valore di vittorie
+                  
 
                     // Scrive la stringa aggiornata nel file
-                    String definitiva = "";
-                    for(int i =0; i<updatedJsonString.length(); i++){
-                        if(i!=updatedJsonString.length()-2){
-                        definitiva=definitiva+updatedJsonString.charAt(i);
-                    }
-                    if (i==0) {
-                        definitiva="["+definitiva+updatedJsonString.charAt(i);    
-                    }
-                    }
+                  
                     Files.write(file.toPath(), updatedJsonString.getBytes());
 
                     System.out.println("Vittorie aggiornate per l'utente " + username);
                 }
-            } else {
-                System.out.println("Utente non trovato: " + username);
-            }
+           
         } catch (IOException e) {
             e.printStackTrace();
         }
