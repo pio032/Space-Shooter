@@ -128,7 +128,7 @@ public class Server_Socket {
                     
                     // Stampa la chiave e il valore
                     System.out.println(key + ": " + value);
-                    if(key.equals(pw) && value.equals(username)){
+                    if(key.equals("password") && value.equals(pw)){
                         tr = true;
                     }
                 }
@@ -396,11 +396,6 @@ public class Server_Socket {
                             } else {
                                 if (finito[i][j] == '#') {
                                     out.print("👽");
-                                    /*
-                                     * if (j != 9) {
-                                     * j++;
-                                     * }
-                                     */
 
                                 } else {
                                     out.print("🌟");
