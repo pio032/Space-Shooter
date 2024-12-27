@@ -35,24 +35,50 @@ public class Server_Socket {
 
     // aggiungi vittoria, aggionra file json e cincrementa la vittoria
     //DA RIVEDERE 
-    public static void updateWin(String username, String nuoveVittorie) {
-        try {
-            // Leggi il contenuto del file JSON come stringa
+    public static void updateWin(String username, String nuoveVittorie) throws IOException {
             File file = new File(username+".json");
-            String jsonString = new String(Files.readAllBytes(file.toPath()));
 
+            String jsonString = new String(Files.readAllBytes(file.toPath()));
             // Trova la parte corrispondente all'utente con lo username specificato
             int startIndex = jsonString.indexOf("\"username\": \"" + username + "\"");
                         
             if (startIndex != -1) {
                 // Trova l'inizio e la fine del campo "vittorie" per quell'utente
                 int vittorieIndex = jsonString.indexOf("\"vittorie\":", startIndex);
-               
+                int endIndex=0;
+                if (vittorieIndex != -1) {
+                    // Trova la fine del valore "vittorie"
+                     endIndex = jsonString.indexOf(",", vittorieIndex);
+                    if (endIndex == -1) {
+                        // Se non c'è la virgola (campo "vittorie" è l'ultimo), trova la parentesi chiusa
+                        endIndex = jsonString.indexOf("}", vittorieIndex);
+                    }
+                }
+                  // prendo il valore corrente delle vittorie
+                String currentVittorieString = jsonString.substring(vittorieIndex + "\"vittorie\":".length(), endIndex).trim();
+                System.out.println("il valore delle vittorie attuali sono: "+currentVittorieString);
                     // Costruisci la nuova stringa con il valore aggiornato
                     int x = Integer.parseInt(nuoveVittorie);
                     String updatedJsonString = "["+"{"+jsonString.substring(x, vittorieIndex + 11) // fino a "vittorie":
                             + "\"" + nuoveVittorie + "\"" +"}"+"]";  // nuovo valore di vittorie
-                  
+                    //controllo doppio graffa
+                    boolean ctrl = false;
+                    for (int i =0; i<updatedJsonString.length(); i++){
+                        if (updatedJsonString.charAt(i)=='{') {
+                            if (updatedJsonString.charAt(i+1)=='{') {
+                                ctrl = true;
+
+                            }
+                        }
+                        if (ctrl) {
+                            //oggetto String builder per modificare la stringa
+                            StringBuilder sb = new StringBuilder(updatedJsonString);
+                            sb.setCharAt((i+1), ' ');
+                            updatedJsonString=sb.toString();
+                            break;
+                        }
+
+                    }
 
                     // Scrive la stringa aggiornata nel file
                   
@@ -60,10 +86,7 @@ public class Server_Socket {
 
                     System.out.println("Vittorie aggiornate per l'utente " + username);
                 }
-           
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+
 
     }
     //VERIFICA L ESISTENZA DI UN UTENTE E NEL CASO NON CI FOSSE LI CREA IL FILE!
@@ -82,7 +105,45 @@ public class Server_Socket {
      }
      return tr;
      }
+     public static int getWin(String username) throws IOException{
+        File file = new File("./"+username + ".json");
+        String currentVittorieString="";
+        String toInt="";
+        // Leggi il contenuto del file JSON
+        String jsonString = new String(Files.readAllBytes(file.toPath()));
 
+        // Trova la posizione dell'utente specificato
+        int startIndex = jsonString.indexOf("\"username\": \"" + username + "\"");
+
+        if (startIndex != -1) {
+            // Trova la posizione del campo "vittorie" per quell'utente
+            int vittorieIndex = jsonString.indexOf("\"vittorie\":", startIndex);
+
+            if (vittorieIndex != -1) {
+                // Trova la fine del valore "vittorie"
+                int endIndex = jsonString.indexOf(",", vittorieIndex);
+                if (endIndex == -1) {
+                    // Se non c'è la virgola (campo "vittorie" è l'ultimo), trova la parentesi chiusa
+                    endIndex = jsonString.indexOf("}", vittorieIndex);
+                }
+
+                // Estrai il valore attuale di "vittorie" (come stringa)
+                 currentVittorieString = jsonString.substring(vittorieIndex + "\"vittorie\":".length(), endIndex).trim();
+                
+                 for(int i=0; i<currentVittorieString.length(); i++){
+                    if (currentVittorieString.charAt(i)!='"') {
+                        toInt = toInt + currentVittorieString.charAt(i);
+                    }
+                 }
+                System.out.println("Valore attuale di 'vittorie': " + Integer.parseInt(toInt));
+            } else {
+                System.out.println("Campo 'vittorie' non trovato per l'utente " + username);
+            }
+        } else {
+            System.out.println("Utente con username '" + username + "' non trovato.");
+        }
+    return Integer.parseInt(toInt);
+     }
     public static boolean login(String username, String pw){
     boolean tr = false;
             // Percorso del file JSON
@@ -352,6 +413,7 @@ public class Server_Socket {
                 //login avvenuto con successo
                 out.print("Benvenuto " + user + "\n");
                 userF = user;
+                win = getWin(userF);
                 out.print("Il numero delle tue vittorie è: " + win + "\n");
                  scelta = true;
                }else{
@@ -501,4 +563,6 @@ public class Server_Socket {
             e.printStackTrace();
         }
     }
+
+
 }
