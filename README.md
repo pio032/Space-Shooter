@@ -20,4 +20,4 @@ Benvenuti nel progetto **UFS_02**, un gioco spaziale stile anni '70 che utilizza
 
 ## 🚀 Come giocare?
 
-### 1. Clona la repository e avvia il server java:
+### 1. Clona la repository e avvia il server java, connettiti con un terminale al tuo server e inzia il gioco!
