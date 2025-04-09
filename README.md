@@ -2,7 +2,7 @@
 
 Benvenuti nel progetto **UFS_02**, un gioco spaziale stile anni '70 che utilizza una connessione **TCP client-server** in **Java**. In questo gioco, sarai a bordo di una navicella spaziale e dovrai affrontare sfide e nemici, cercando di sopravvivere nel profondo dello spazio!
 
-## 🎮 Cos'è UFS_02?
+## 🎮 Cos'è Space Shooter?
 
 **UFS_02** è un gioco retro in cui il giocatore controlla una navicella spaziale e combatte contro ondate di nemici. Il gioco si sviluppa con una **connessione TCP client-server**: il server gestisce la logica di gioco, mentre il client permette ai giocatori di interagire in tempo reale.
 
