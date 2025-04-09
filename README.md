@@ -1,4 +1,4 @@
-# Progetto UFS_02 - Space Shooter Game (TCP Client-Server in Java)
+# Space Shooter Game (TCP Client-Server in Java)
 
 Benvenuti nel progetto **UFS_02**, un gioco spaziale stile anni '70 che utilizza una connessione **TCP client-server** in **Java**. In questo gioco, sarai a bordo di una navicella spaziale e dovrai affrontare sfide e nemici, cercando di sopravvivere nel profondo dello spazio!
 
